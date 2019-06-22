@@ -1,2 +1,1 @@
-# fractals
-Program to draw fractals
+# A program to create and draw graphics
