@@ -1,6 +1,5 @@
-
-#include    <gl\glu.h>                            // Header File For The GLu32 Library
-#include    <gl\glaux.h>                          // Header File For The GLaux Library
+#include    <GL/glu.h>                            // Header File For The GLu32 Library
+#include    <GL/glaux.h>                          // Header File For The GLaux Library
 
 bool        keys[256];                          // Array Used For The Keyboard Routine
 bool        active=TRUE;                            // Window Active Flag
