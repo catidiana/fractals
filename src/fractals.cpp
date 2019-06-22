@@ -28,7 +28,7 @@
 #include <stdint.h>
 #include <assert.h>
 #include <math.h>
-// #include <dos.h>
+#include <dos.h>
 #include <string.h>
 
 typedef float    r32;
@@ -75,7 +75,6 @@ to_color (u32 hex_color)
 #include "mandelbrot.cpp"
 #include "figures.cpp"
 #include "lines.cpp"
-#include "load_image.cpp"
 
 
 static void
@@ -156,15 +155,6 @@ show_image (Image image)
 }
 
 
-static void
-load_image (char *Filename, Image image)
-{
-    AUX_RGBImageRec *LoadBMP(*Filename);
-    LoadGLTextures(*Filename, image);
-    InitGL(image);
-    DrawGLScene(image) ;
-}
-
 
 
 int
@@ -198,8 +188,6 @@ main (int argc, char **argv)
     int window_w = MAIN_WINDOW_INIT_WIDTH;
     int window_h = MAIN_WINDOW_INIT_WIDTH;
 
-
-    load_image ("image.bmp", images[1]);
 
     int key_pressed = 0;
 
