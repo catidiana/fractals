@@ -155,6 +155,50 @@ show_image (Image image)
 }
 
 
+struct Image load_image (char *Filename)
+{
+  FILE *file = fopen (Filename, "rb");
+  assert (file);
+
+  Image;
+  image.w = 100;
+  image.h = 100;
+
+  size_t pixels_count = image.w * image.h;
+  image.pixels = (V3 *) malloc (pixles_count * sizeof (V3));
+
+  size_t filesize = pixels_count;
+  u8 file_contents = (u8 *) malloc (filesize* sizeof (u8));
+  size_t bytes_read = fread (file_contents, 1, filesize, file);
+  assert (bytes_read == file_size);
+  fclose (file);
+
+  for (size_t i = 0; i < pixels_count; ++i)
+    {
+      u8 byte = file_contents[i];
+      V3 p = {byte, byte, byte};
+      image.pixels[i] = p;
+    }
+
+   free (file_contents);
+   return image;
+}
+
+
+static void
+draw_image (Image image_des, char *Filename, u32 x_start, u32 y_start)
+{
+   load_image (Filename) ;
+   V3 * pointer = image_des.pixels;
+   for (s32 y = y_start; y < x_start + image.h; y++)
+   {
+       for (s32 x = x_start; x < image.w; x++)
+       {
+          * pointer = image.pixels[y*image_des.w + x];
+           pointer++;
+       }
+   }
+}
 
 
 int
@@ -195,6 +239,8 @@ main (int argc, char **argv)
     //uniform_fill (images[1], 0xffffff);
     uniform_fill (images[2], 0xffffff);
     uniform_fill (images[3], 0xffffff);
+    
+    draw_image (images[1], "font6x10.data", 200, 200);
 
     V3 color_scheme[60];
     u32 hex_color1 = 0x0000ff;
