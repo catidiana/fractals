@@ -28,7 +28,6 @@
 #include <stdint.h>
 #include <assert.h>
 #include <math.h>
-#include <dos.h>
 #include <string.h>
 
 typedef float    r32;
@@ -160,8 +159,8 @@ struct Image load_image (const char *Filename)
   assert (file);
 
   Image image_src;
-  image_src.w = 64;
-  image_src.h = 32;
+  image_src.w = 320;
+  image_src.h = 760;
 
   u32 pixels_count = image_src.w * image_src.h;
   image_src.pixels = (V3 *) malloc (pixels_count * sizeof (V3));
@@ -192,7 +191,7 @@ draw_image (Image image_des, const char *Filename, u32 x_start, u32 y_start)
    {
        for (u32 x = x_start; x < x_start + image_src.w; x++)
        {
-          image_des.pixels[y*image_des.w + x] = image_src.pixels[y*image_des.w + x];
+          image_des.pixels[y*image_des.w + x] = image_src.pixels[y*image_src.w + x];
 
        }
    }
@@ -239,7 +238,7 @@ main (int argc, char **argv)
     uniform_fill (images[2], 0xffffff);
     uniform_fill (images[3], 0xffffff);
 
-    draw_image (images[1], "font6x10.data", 200, 200);
+    draw_image (images[1], "instr.data", 0, 0);
 
     V3 color_scheme[60];
     u32 hex_color1 = 0x0000ff;
@@ -391,7 +390,8 @@ main (int argc, char **argv)
 
         }
         ++s;
-        Sleep(frame_time);
+        SDL_Delay(frame_time);
+
 
 
         for (u32 i = 0; i < images_count; ++i)
