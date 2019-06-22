@@ -167,9 +167,9 @@ struct Image load_image (char *Filename)
   image_src.pixels = (V3 *) malloc (pixels_count * sizeof (V3));
 
   u32 filesize = pixels_count;
-  u8 file_contents = (u8 *) malloc (filesize* sizeof (u8));
+  u8 *file_contents = (u8 *) malloc (filesize);
   u32 bytes_read = fread (file_contents, 1, filesize, file);
-  assert (bytes_read == file_size);
+  assert (bytes_read == filesize);
   fclose (file);
 
   for (size_t i = 0; i < pixels_count; ++i)
@@ -188,13 +188,12 @@ static void
 draw_image (Image image_des, char *Filename, u32 x_start, u32 y_start)
 {
    Image image_src = load_image (Filename) ;
-   V3 * pointer = image_des.pixels;
    for (u32 y = y_start; y < x_start + image_des.h; y++)
    {
        for (u32 x = x_start; x < image_des.w; x++)
        {
-          * pointer = image_src.pixels[y*image_des.w + x];
-           pointer++;
+          image_des.pixels[y*image_des.w + x] = image_src.pixels[y*image_des.w + x];
+
        }
    }
 }
