@@ -154,7 +154,7 @@ show_image (Image image)
     glEnd ();
 }
 
-struct Image load_image (char *Filename)
+struct Image load_image (const char *Filename)
 {
   FILE *file = fopen (Filename, "rb");
   assert (file);
@@ -185,7 +185,7 @@ struct Image load_image (char *Filename)
 
 
 static void
-draw_image (Image image_des, char *Filename, u32 x_start, u32 y_start)
+draw_image (Image image_des, const char *Filename, u32 x_start, u32 y_start)
 {
    Image image_src = load_image (Filename) ;
    for (u32 y = y_start; y < x_start + image_src.h; y++)
@@ -235,7 +235,7 @@ main (int argc, char **argv)
     int key_pressed = 0;
 
     uniform_fill (images[0], 0x000000);
-    //uniform_fill (images[1], 0xffffff);
+    uniform_fill (images[1], 0xffffff);
     uniform_fill (images[2], 0xffffff);
     uniform_fill (images[3], 0xffffff);
 
