@@ -188,9 +188,9 @@ static void
 draw_image (Image image_des, const char *Filename, u32 x_start, u32 y_start)
 {
    Image image_src = load_image (Filename) ;
-   for (u32 y = y_start; y < x_start + image_src.h; y++)
+   for (u32 y = y_start; y < y_start + image_src.h; y++)
    {
-       for (u32 x = x_start; x < image_src.w; x++)
+       for (u32 x = x_start; x < x_start + image_src.w; x++)
        {
           image_des.pixels[y*image_des.w + x] = image_src.pixels[y*image_des.w + x];
 
