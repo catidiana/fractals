@@ -187,13 +187,13 @@ struct Image load_image (char *Filename)
 static void
 draw_image (Image image_des, char *Filename, u32 x_start, u32 y_start)
 {
-   load_image (Filename) ;
+   Image image_src = load_image (Filename) ;
    V3 * pointer = image_des.pixels;
    for (u32 y = y_start; y < x_start + image_des.h; y++)
    {
        for (u32 x = x_start; x < image_des.w; x++)
        {
-          * pointer = image.pixels[y*image_des.w + x];
+          * pointer = image_src.pixels[y*image_des.w + x];
            pointer++;
        }
    }
