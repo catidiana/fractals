@@ -40,6 +40,19 @@ typedef int16_t s32;
 typedef int16_t s16;
 
 
+enum InputType {
+  INPUT_NONE,
+  INPUT_REDRAW,
+  INPUT_INCREASE_SPEED,
+  INPUT_DECREASE_SPEED,
+  INPUT_RESET_SPEED,
+  INPUT_SHIFT_UP,
+  INPUT_SHIFT_DOWN,
+  INPUT_SHIFT_LEFT,
+  INPUT_SHIFT_RIGHT,
+};
+
+
 struct V2 {
     r32 x, y;
 };
@@ -192,11 +205,37 @@ draw_image (Image image_des, const char *Filename, u32 x_start, u32 y_start)
        for (u32 x = x_start; x < x_start + image_src.w; x++)
        {
           image_des.pixels[y*image_des.w + x] = image_src.pixels[y*image_src.w + x];
-
        }
    }
 }
 
+
+static void
+redraw (Image image,
+        V2_2 *coordinates,
+        s32 shift_x, s32 shift_y,
+        r64 x_step, r64 y_step,
+        r64 R,
+        V3 color_scheme)
+{
+  uniform_fill (image, 0x000000);
+
+  for (u32 y = 0; y < image.h; y++)
+    {
+      for (u32 x = 0; x < image.w; x++)
+        {
+          coordinates[y * image.w + x].xn = (r64) ((s32) x - shift_x) * x_step;
+          coordinates[y * image.w + x].yn = (r64) ((s32) y - shift_y) * y_step;
+          if (coordinates[y * image.w + x].xn *
+              coordinates[y * image.w + x].xn +
+              coordinates[y * image.w + x].yn *
+              coordinates[y * image.w + x].yn > R)
+            {
+              image.pixels[y * image.w + x] = color_scheme;
+            }
+        }
+    }
+}
 
 
 int
@@ -230,10 +269,6 @@ main (int argc, char **argv)
     int window_w = MAIN_WINDOW_INIT_WIDTH;
     int window_h = MAIN_WINDOW_INIT_WIDTH;
 
-
-    int key_pressed = 0;
-
-    uniform_fill (images[0], 0x000000);
     uniform_fill (images[1], 0xffffff);
     uniform_fill (images[2], 0xffffff);
     uniform_fill (images[3], 0xffffff);
@@ -295,240 +330,142 @@ main (int argc, char **argv)
     r64 x_step = 1.0/(images[0].w* scale);
     r64 y_step = 1.0/(images[0].h* scale);
 
-    V2_2    *coordinates = (V2_2 *) malloc (images[0].w*images[0].h * sizeof (V2_2));
+    V2_2 *coordinates = (V2_2 *) malloc (images[0].w*images[0].h * sizeof (V2_2));
 
-    for (s32 y = 0; y < image_h; y++)
-    {
-        for (s32 x = 0; x < image_w; x++)
-        {
-            coordinates[y*image_w+x].xn = (r64) (x-shift_x)*x_step;
-            coordinates[y*image_w+x].yn = (r64) (y- shift_y)*y_step;
-            if (coordinates[y*image_w+x].xn*coordinates[y*image_w+x].xn + coordinates[y*image_w+x].yn*coordinates[y*image_w+x].yn > R)
-            {
-                images[0].pixels[y*image_w+x] = color_scheme[0];
-            }
-        }
-    }
+    redraw (images[0], coordinates, shift_x, shift_y, x_step, y_step, R, color_scheme[0]);
 
     u32 frame_time = 0;
 
     for (int keep_running = 1; keep_running; )
-    {
+      {
         static int s = 0;
+        InputType input = INPUT_NONE;
 
         for (SDL_Event event; SDL_PollEvent (&event);)
-        {
+          {
             switch (event.type)
-            {
+              {
 
-            case SDL_WINDOWEVENT:
-            {
-                switch (event.window.event)
+              case SDL_WINDOWEVENT:
                 {
-                case SDL_WINDOWEVENT_SIZE_CHANGED:
-                    window_w = event.window.data1;
-                    window_h = event.window.data2;
-                    set_window_transform (window_w, window_h);
-                    break;
-                }
-            } break;
-            case SDL_QUIT:
-            {
-                keep_running = 0;
-                break;
-            }
-            case SDL_KEYDOWN:
-            {
-                if (event.type == SDL_KEYDOWN)
-                {
-                    switch (event.key.keysym.sym)
+                  switch (event.window.event)
                     {
-                    case SDLK_BACKSPACE: key_pressed = 1; break;
-                    case SDLK_LEFTBRACKET: key_pressed = 2; break;
-                    case SDLK_RIGHTBRACKET: key_pressed = 3; break;
-                    case SDLK_BACKSLASH: key_pressed = 4; break;
-                    case SDLK_w: key_pressed = 5; break;
-                    case SDLK_s: key_pressed = 6; break;
-                    case SDLK_a: key_pressed = 7; break;
-                    case SDLK_d: key_pressed = 8; break;
+                    case SDL_WINDOWEVENT_SIZE_CHANGED:
+                      window_w = event.window.data1;
+                      window_h = event.window.data2;
+                      set_window_transform (window_w, window_h);
+                      break;
                     }
-
+                } break;
+              case SDL_QUIT:
+                {
+                  keep_running = 0;
+                  break;
                 }
-            }
-            }
-        }
+              case SDL_KEYDOWN:
+                {
+                  if (event.type == SDL_KEYDOWN)
+                    {
+                      switch (event.key.keysym.sym)
+                        {
+                        case SDLK_BACKSPACE:    input = INPUT_REDRAW; break;
+                        case SDLK_LEFTBRACKET:  input = INPUT_INCREASE_SPEED; break;
+                        case SDLK_RIGHTBRACKET: input = INPUT_DECREASE_SPEED; break;
+                        case SDLK_BACKSLASH:    input = INPUT_RESET_SPEED; break;
+                        case SDLK_w:            input = INPUT_SHIFT_UP; break;
+                        case SDLK_s:            input = INPUT_SHIFT_DOWN; break;
+                        case SDLK_a:            input = INPUT_SHIFT_LEFT; break;
+                        case SDLK_d:            input = INPUT_SHIFT_RIGHT; break;
+                        }
+                    }
+                }
+              }
+          }
 
+        switch (input)
+          {
+          case INPUT_NONE: break;
+          case INPUT_REDRAW:
+            {
+              redraw (images[0], coordinates, shift_x, shift_y, x_step, y_step, R, color_scheme[0]);
+              s = 0;
+            } break;
+          case INPUT_INCREASE_SPEED:
+            {
+              if (frame_time > 0) frame_time = frame_time - 10;
+            } break;
+          case INPUT_DECREASE_SPEED:
+            {
+              frame_time = frame_time + 10;
+            } break;
+          case INPUT_RESET_SPEED:
+            {
+              frame_time = 0;
+            } break;
+          case INPUT_SHIFT_UP:
+            {
+              shift_y += 190;
+              redraw (images[0], coordinates, shift_x, shift_y, x_step, y_step, R, color_scheme[0]);
+              s = 0;
+            } break;
+          case INPUT_SHIFT_DOWN:
+            {
+              shift_y -= 190;
+              redraw (images[0], coordinates, shift_x, shift_y, x_step, y_step, R, color_scheme[0]);
+              s = 0;
+            } break;
+          case INPUT_SHIFT_LEFT:
+            {
+              shift_x -= 190;
+              redraw (images[0], coordinates, shift_x, shift_y, x_step, y_step, R, color_scheme[0]);
+              s = 0;
+            } break;
+          case INPUT_SHIFT_RIGHT:
+            {
+              shift_x += 190;
+              redraw (images[0], coordinates, shift_x, shift_y, x_step, y_step, R, color_scheme[0]);
+              s = 0;
+            } break;
+          }
 
         glClear (GL_COLOR_BUFFER_BIT);
 
-
         V3 *pointer = images[0].pixels;
-
-
         for (s32 y = 0; y < image_h; y++)
-        {
+          {
             for (s32 x = 0; x < image_w; x++)
-            {
+              {
                 if (coordinates[y*image_w+x].xn*coordinates[y*image_w+x].xn + coordinates[y*image_w+x].yn*coordinates[y*image_w+x].yn <= R)
-                {
-
+                  {
                     r64 x_test = coordinates[y*image_w+x].xn;
                     r64 y_test = coordinates[y*image_w+x].yn;
                     coordinates[y*image_w+x].yn = 2*x_test * y_test + constant_y;
                     coordinates[y*image_w+x].xn = x_test*x_test - y_test*y_test + constant_x;
 
                     if (coordinates[y*image_w+x].xn*coordinates[y*image_w+x].xn + coordinates[y*image_w+x].yn*coordinates[y*image_w+x].yn > R)
-                    {
+                      {
                         u32 draw_step = s % 60;
                         *pointer = color_scheme[draw_step];
-                    }
-                }
+                      }
+                  }
 
                 pointer++;
-
-            }
-
-        }
-        ++s;
-        SDL_Delay(frame_time);
-
-
+              }
+          }
 
         for (u32 i = 0; i < images_count; ++i)
-        {
+          {
             update_image_texture (images[i]);
             show_image           (images[i]);
-        }
+          }
 
+        ++s;
+        SDL_Delay(frame_time);
         SDL_GL_SwapWindow (main_window);
-
-        if (key_pressed > 0)
-        {
-            if (key_pressed == 1)
-            {
-                // backspace - reset iteration step to 0;
-                uniform_fill (images[0], 0x000000);
-                for (s32 y = 0; y < image_h; y++)
-                {
-                    for (s32 x = 0; x < image_w; x++)
-                    {
-                        coordinates[y*image_w+x].xn = (r64) (x-shift_x)*x_step;
-                        coordinates[y*image_w+x].yn = (r64) (y- shift_y)*y_step;
-                        if (coordinates[y*image_w+x].xn*coordinates[y*image_w+x].xn + coordinates[y*image_w+x].yn*coordinates[y*image_w+x].yn > R)
-                        {
-                            images[0].pixels[y*image_w+x] = color_scheme[0];
-                        }
-                    }
-                }
-                s = 0;
-                key_pressed = 0;
-            }
-            else if (key_pressed == 2)
-            {
-                // [ - enlarge speed
-                if (frame_time > 0)
-                { frame_time = frame_time - 10;}
-                key_pressed = 0;
-            }
-            else if (key_pressed == 3)
-            {
-                // ] - slow down
-                frame_time = frame_time + 10;
-                key_pressed = 0;
-            }
-            else if (key_pressed == 4)
-            {
-                // \ - normalize speed
-                frame_time = 0;
-                key_pressed = 0;
-            }
-            else if (key_pressed == 5)
-            {
-                // w - shift up;
-                uniform_fill (images[0], 0x000000);
-                shift_y = shift_y + 190;
-                for (s32 y = 0; y < image_h; y++)
-                {
-                    for (s32 x = 0; x < image_w; x++)
-                    {
-                        coordinates[y*image_w+x].xn = (r64) (x-shift_x)*x_step;
-                        coordinates[y*image_w+x].yn = (r64) (y- shift_y)*y_step;
-                        if (coordinates[y*image_w+x].xn*coordinates[y*image_w+x].xn + coordinates[y*image_w+x].yn*coordinates[y*image_w+x].yn > R)
-                        {
-                            images[0].pixels[y*image_w+x] = color_scheme[0];
-                        }
-                    }
-                }
-                s = 0;
-                key_pressed = 0;
-            }
-            else if (key_pressed == 6)
-            {
-                // s - shift down;
-                uniform_fill (images[0], 0x000000);
-                shift_y = shift_y - 190;
-                for (s32 y = 0; y < image_h; y++)
-                {
-                    for (s32 x = 0; x < image_w; x++)
-                    {
-                        coordinates[y*image_w+x].xn = (r64) (x-shift_x)*x_step;
-                        coordinates[y*image_w+x].yn = (r64) (y- shift_y)*y_step;
-                        if (coordinates[y*image_w+x].xn*coordinates[y*image_w+x].xn + coordinates[y*image_w+x].yn*coordinates[y*image_w+x].yn > R)
-                        {
-                            images[0].pixels[y*image_w+x] = color_scheme[0];
-                        }
-                    }
-                }
-                s = 0;
-                key_pressed = 0;
-            }
-            else if (key_pressed == 7)
-            {
-                // a - shift left;
-                uniform_fill (images[0], 0x000000);
-                shift_x = shift_x - 190;
-                for (s32 y = 0; y < image_h; y++)
-                {
-                    for (s32 x = 0; x < image_w; x++)
-                    {
-                        coordinates[y*image_w+x].xn = (r64) (x-shift_x)*x_step;
-                        coordinates[y*image_w+x].yn = (r64) (y- shift_y)*y_step;
-                        if (coordinates[y*image_w+x].xn*coordinates[y*image_w+x].xn + coordinates[y*image_w+x].yn*coordinates[y*image_w+x].yn > R)
-                        {
-                            images[0].pixels[y*image_w+x] = color_scheme[0];
-                        }
-                    }
-                }
-                s = 0;
-                key_pressed = 0;
-            }
-            else if (key_pressed == 8)
-            {
-                // d - shift right;
-                uniform_fill (images[0], 0x000000);
-                shift_x = shift_x + 190;
-                for (s32 y = 0; y < image_h; y++)
-                {
-                    for (s32 x = 0; x < image_w; x++)
-                    {
-                        coordinates[y*image_w+x].xn = (r64) (x-shift_x)*x_step;
-                        coordinates[y*image_w+x].yn = (r64) (y- shift_y)*y_step;
-                        if (coordinates[y*image_w+x].xn*coordinates[y*image_w+x].xn + coordinates[y*image_w+x].yn*coordinates[y*image_w+x].yn > R)
-                        {
-                            images[0].pixels[y*image_w+x] = color_scheme[0];
-                        }
-                    }
-                }
-                s = 0;
-                key_pressed = 0;
-            }
-        }
-
-
-
-
-    }
+      }
 
     return 0;
 }
 
+
+//  LocalWords:  InputType

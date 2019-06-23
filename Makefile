@@ -1,4 +1,4 @@
-PACKAGES = sdl2 glu
+PACKAGES = sdl2
 CFLAGS = -Wall -Wno-unused-function -std=c++11
 LDLIBS = -lm
 MACROS =
