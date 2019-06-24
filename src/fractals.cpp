@@ -513,6 +513,7 @@ main (int argc, char **argv)
             constant_pool_num = (constant_pool_num +1)%14;
             constant_x = constant_pool[constant_pool_num][0];
             constant_y = constant_pool[constant_pool_num][1];
+            R = (1 + sqrt (1 + 4* sqrt (constant_x*constant_x + constant_y*constant_y))) + 1;
             redraw (images[0], coordinates, shift_x, shift_y, scale, R, color_scheme[0]);
             s = 0;
             draw_rectangle (images[2], 86, 19, 62, 18, 0xffffff);
@@ -675,6 +676,7 @@ main (int argc, char **argv)
             constant_pool_num = 0;
             constant_x = constant_pool[constant_pool_num][0];
             constant_y = constant_pool[constant_pool_num][1];
+            R = (1 + sqrt (1 + 4* sqrt (constant_x*constant_x + constant_y*constant_y))) + 1;
             hex_color1 = 0x0000ff;
             hex_color2 = 0xffffff;
             hex_color3 = 0xffa000;
