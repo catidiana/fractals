@@ -41,15 +41,25 @@ typedef int16_t s16;
 
 
 enum InputType {
-  INPUT_NONE,
-  INPUT_REDRAW,
-  INPUT_INCREASE_SPEED,
-  INPUT_DECREASE_SPEED,
-  INPUT_RESET_SPEED,
-  INPUT_SHIFT_UP,
-  INPUT_SHIFT_DOWN,
-  INPUT_SHIFT_LEFT,
-  INPUT_SHIFT_RIGHT,
+    INPUT_NONE,
+    INPUT_REDRAW,
+    INPUT_INCREASE_SPEED,
+    INPUT_DECREASE_SPEED,
+    INPUT_RESET_SPEED,
+    INPUT_SHIFT_UP,
+    INPUT_SHIFT_DOWN,
+    INPUT_SHIFT_LEFT,
+    INPUT_SHIFT_RIGHT,
+    INPUT_FREEZE_UNFREEZE,
+    INPUT_ZOOM_IN,
+    INPUT_ZOOM_OUT,
+    INPUT_RESET_SCALE,
+    INPUT_CONSTANT,
+    INPUT_COLOR_1,
+    INPUT_COLOR_2,
+    INPUT_COLOR_3,
+    INPUT_RESET_COLORS,
+    INPUT_TOTAL_RESET,
 };
 
 
@@ -84,9 +94,9 @@ to_color (u32 hex_color)
 }
 
 
-#include "mandelbrot.cpp"
+//#include "mandelbrot.cpp"
 #include "figures.cpp"
-#include "lines.cpp"
+#include "text.cpp"
 
 
 static void
@@ -166,72 +176,31 @@ show_image (Image image)
     glEnd ();
 }
 
-struct Image load_image (const char *Filename)
-{
-  FILE *file = fopen (Filename, "rb");
-  assert (file);
-
-  Image image_src;
-  image_src.w = 320;
-  image_src.h = 760;
-
-  u32 pixels_count = image_src.w * image_src.h;
-  image_src.pixels = (V3 *) malloc (pixels_count * sizeof (V3));
-
-  u32 filesize = pixels_count;
-  u8 *file_contents = (u8 *) malloc (filesize);
-  u32 bytes_read = fread (file_contents, 1, filesize, file);
-  assert (bytes_read == filesize);
-  fclose (file);
-
-  for (size_t i = 0; i < pixels_count; ++i)
-    {
-      u8 byte = file_contents[i];
-      V3 p = {byte, byte, byte};
-      image_src.pixels[i] = p;
-    }
-
-   free (file_contents);
-   return image_src;
-}
-
-
-static void
-draw_image (Image image_des, const char *Filename, u32 x_start, u32 y_start)
-{
-   Image image_src = load_image (Filename) ;
-   for (u32 y = y_start; y < y_start + image_src.h; y++)
-   {
-       for (u32 x = x_start; x < x_start + image_src.w; x++)
-       {
-          image_des.pixels[y*image_des.w + x] = image_src.pixels[y*image_src.w + x];
-       }
-   }
-}
-
 
 static void
 redraw (Image image,
         V2_2 *coordinates,
         s32 shift_x, s32 shift_y,
-        r64 x_step, r64 y_step,
+        r64 scale,
         r64 R,
         V3 color_scheme)
 {
-  uniform_fill (image, 0x000000);
+    uniform_fill (image, 0x000000);
+    r64 x_step = 1.0/(image.w* scale);
+    r64 y_step = 1.0/(image.h* scale);
 
-  for (u32 y = 0; y < image.h; y++)
+    for (u32 y = 0; y < image.h; y++)
     {
-      for (u32 x = 0; x < image.w; x++)
+        for (u32 x = 0; x < image.w; x++)
         {
-          coordinates[y * image.w + x].xn = (r64) ((s32) x - shift_x) * x_step;
-          coordinates[y * image.w + x].yn = (r64) ((s32) y - shift_y) * y_step;
-          if (coordinates[y * image.w + x].xn *
-              coordinates[y * image.w + x].xn +
-              coordinates[y * image.w + x].yn *
-              coordinates[y * image.w + x].yn > R)
+            coordinates[y * image.w + x].xn = (r64) ((s32) x - shift_x) * x_step;
+            coordinates[y * image.w + x].yn = (r64) ((s32) y - shift_y) * y_step;
+            if (coordinates[y * image.w + x].xn *
+                    coordinates[y * image.w + x].xn +
+                    coordinates[y * image.w + x].yn *
+                    coordinates[y * image.w + x].yn > R)
             {
-              image.pixels[y * image.w + x] = color_scheme;
+                image.pixels[y * image.w + x] = color_scheme;
             }
         }
     }
@@ -273,7 +242,8 @@ main (int argc, char **argv)
     uniform_fill (images[2], 0xffffff);
     uniform_fill (images[3], 0xffffff);
 
-    draw_image (images[1], "instr.data", 0, 0);
+    draw_image (images[1], "res/instr.data", 320, 760, 0, 0);
+    draw_image (images[2], "res/low.data", 760, 40, 0, 0);
 
     V3 color_scheme[60];
     u32 hex_color1 = 0x0000ff;
@@ -317,9 +287,20 @@ main (int argc, char **argv)
 
     }
 
-    r64 constant_x = 0.285;
-    r64 constant_y = 0.01;
-    r32 scale = 0.3;
+    draw_square (images[3], 45, 20, 32, 0x000000);
+    draw_square (images[3], 85, 20, 32, 0x000000);
+    draw_square (images[3], 125, 20, 32, 0x000000);
+    draw_square (images[3], 45, 20, 30, hex_color1);
+    draw_square (images[3], 85, 20, 30, hex_color2);
+    draw_square (images[3], 125, 20, 30, hex_color3);
+
+    r64 constant_pool[14][2] = {{0.285, 0.01},{0.28, 0.0113},{0.285, 0}, {0.45, 0.1428}, {-0.0085, 0.71},{-0.1, 0.651},{-0.382, 0.618},{-0.618, 0},{-0.74543, 0.11301},{- 0.8, 0.156},{-0.70176, -0.3842}, {-0.835, -0.2321},{ -0.7269, 0.1889}, {0, -0.8}};
+    u32 constant_pool_num = 0;
+
+
+    r64 constant_x = constant_pool[constant_pool_num][0];
+    r64 constant_y = constant_pool[constant_pool_num][1];
+    r32 scale = 0.25;
     s32 shift_x = 380;
     s32 shift_y = 380;
     s32 image_w = images[0].w;
@@ -327,142 +308,476 @@ main (int argc, char **argv)
     r64 R = (1 + sqrt (1 + 4* sqrt (constant_x*constant_x + constant_y*constant_y))) + 1;
 
 
-    r64 x_step = 1.0/(images[0].w* scale);
-    r64 y_step = 1.0/(images[0].h* scale);
+
 
     V2_2 *coordinates = (V2_2 *) malloc (images[0].w*images[0].h * sizeof (V2_2));
 
-    redraw (images[0], coordinates, shift_x, shift_y, x_step, y_step, R, color_scheme[0]);
+    redraw (images[0], coordinates, shift_x, shift_y, scale, R, color_scheme[0]);
 
     u32 frame_time = 0;
+    bool freeze_flag = false;
+
+    draw_double (images[2], constant_x, 166, 13);
+    draw_double (images[2], constant_y, 251, 13);
+    draw_double (images[2], coordinates[0].xn, 375, 13);
+    draw_double (images[2], coordinates[images[0].w - 1].xn + 1.0/(images[0].w* scale), 468, 13);
+    draw_double (images[2], coordinates[0].yn, 589, 13);
+    draw_double (images[2], coordinates[images[0].w * images[0].h - 1].yn + 1.0/(images[0].h* scale), 683, 13);
 
     for (int keep_running = 1; keep_running; )
-      {
+    {
         static int s = 0;
         InputType input = INPUT_NONE;
 
         for (SDL_Event event; SDL_PollEvent (&event);)
-          {
+        {
             switch (event.type)
-              {
+            {
 
-              case SDL_WINDOWEVENT:
+            case SDL_WINDOWEVENT:
+            {
+                switch (event.window.event)
                 {
-                  switch (event.window.event)
-                    {
-                    case SDL_WINDOWEVENT_SIZE_CHANGED:
-                      window_w = event.window.data1;
-                      window_h = event.window.data2;
-                      set_window_transform (window_w, window_h);
-                      break;
-                    }
-                } break;
-              case SDL_QUIT:
-                {
-                  keep_running = 0;
-                  break;
+                case SDL_WINDOWEVENT_SIZE_CHANGED:
+                    window_w = event.window.data1;
+                    window_h = event.window.data2;
+                    set_window_transform (window_w, window_h);
+                    break;
                 }
-              case SDL_KEYDOWN:
+            } break;
+            case SDL_QUIT:
+            {
+                keep_running = 0;
+                break;
+            }
+            case SDL_KEYDOWN:
+            {
+                if (event.type == SDL_KEYDOWN)
                 {
-                  if (event.type == SDL_KEYDOWN)
+                    switch (event.key.keysym.sym)
                     {
-                      switch (event.key.keysym.sym)
-                        {
-                        case SDLK_BACKSPACE:    input = INPUT_REDRAW; break;
-                        case SDLK_LEFTBRACKET:  input = INPUT_INCREASE_SPEED; break;
-                        case SDLK_RIGHTBRACKET: input = INPUT_DECREASE_SPEED; break;
-                        case SDLK_BACKSLASH:    input = INPUT_RESET_SPEED; break;
-                        case SDLK_w:            input = INPUT_SHIFT_UP; break;
-                        case SDLK_s:            input = INPUT_SHIFT_DOWN; break;
-                        case SDLK_a:            input = INPUT_SHIFT_LEFT; break;
-                        case SDLK_d:            input = INPUT_SHIFT_RIGHT; break;
-                        }
+                    case SDLK_BACKSPACE:    input = INPUT_REDRAW; break;
+                    case SDLK_LEFTBRACKET:  input = INPUT_INCREASE_SPEED; break;
+                    case SDLK_RIGHTBRACKET: input = INPUT_DECREASE_SPEED; break;
+                    case SDLK_BACKSLASH:    input = INPUT_RESET_SPEED; break;
+                    case SDLK_w:            input = INPUT_SHIFT_UP; break;
+                    case SDLK_s:            input = INPUT_SHIFT_DOWN; break;
+                    case SDLK_a:            input = INPUT_SHIFT_LEFT; break;
+                    case SDLK_d:            input = INPUT_SHIFT_RIGHT; break;
+                    case SDLK_f:            input = INPUT_FREEZE_UNFREEZE; break;
+                    case SDLK_z:            input = INPUT_ZOOM_IN; break;
+                    case SDLK_x:            input = INPUT_ZOOM_OUT; break;
+                    case SDLK_q:            input = INPUT_RESET_SCALE; break;
+                    case SDLK_c:            input = INPUT_CONSTANT; break;
+                    case SDLK_1:            input = INPUT_COLOR_1; break;
+                    case SDLK_2:            input = INPUT_COLOR_2; break;
+                    case SDLK_3:            input = INPUT_COLOR_3; break;
+                    case SDLK_0:            input = INPUT_RESET_COLORS; break;
+                    case SDLK_r:            input = INPUT_TOTAL_RESET; break;
                     }
                 }
-              }
-          }
+            }
+            }
+        }
 
         switch (input)
-          {
-          case INPUT_NONE: break;
-          case INPUT_REDRAW:
+        {
+        case INPUT_NONE: break;
+        case INPUT_REDRAW:
+        {
+            redraw (images[0], coordinates, shift_x, shift_y, scale, R, color_scheme[0]);
+            s = 0;
+            draw_rectangle (images[2], 86, 19, 62, 18, 0xffffff);
+        } break;
+        case INPUT_INCREASE_SPEED:
+        {
+            if (frame_time > 0) frame_time = frame_time - 10;
+        } break;
+        case INPUT_DECREASE_SPEED:
+        {
+            frame_time = frame_time + 10;
+        } break;
+        case INPUT_RESET_SPEED:
+        {
+            frame_time = 0;
+        } break;
+        case INPUT_SHIFT_UP:
+        {
+            shift_y += 190;
+            redraw (images[0], coordinates, shift_x, shift_y, scale, R, color_scheme[0]);
+            s = 0;
+            draw_rectangle (images[2], 86, 19, 62, 18, 0xffffff);
+            draw_rectangle (images[2], 627, 19, 83, 21, 0xffffff);
+            draw_rectangle (images[2], 720, 19, 78, 21, 0xffffff);
+            draw_double (images[2], coordinates[0].yn, 589, 13);
+            draw_double (images[2], coordinates[images[0].w * images[0].h - 1].yn + 1.0/(images[0].h* scale), 683, 13);
+        } break;
+        case INPUT_SHIFT_DOWN:
+        {
+            shift_y -= 190;
+            redraw (images[0], coordinates, shift_x, shift_y, scale, R, color_scheme[0]);
+            s = 0;
+            draw_rectangle (images[2], 86, 19, 62, 18, 0xffffff);
+            draw_rectangle (images[2], 627, 19, 83, 21, 0xffffff);
+            draw_rectangle (images[2], 720, 19, 78, 21, 0xffffff);
+            draw_double (images[2], coordinates[0].yn, 589, 13);
+            draw_double (images[2], coordinates[images[0].w * images[0].h - 1].yn + 1.0/(images[0].h* scale), 683, 13);
+        } break;
+        case INPUT_SHIFT_LEFT:
+        {
+            shift_x -= 190;
+            redraw (images[0], coordinates, shift_x, shift_y, scale, R, color_scheme[0]);
+            s = 0;
+            draw_rectangle (images[2], 86, 19, 62, 18, 0xffffff);
+            draw_rectangle (images[2], 411, 21, 80, 21, 0xffffff);
+            draw_rectangle (images[2], 509, 21, 85, 21, 0xffffff);
+            draw_double (images[2], coordinates[0].xn, 375, 13);
+            draw_double (images[2], coordinates[images[0].w - 1].xn + 1.0/(images[0].w* scale), 468, 13);
+        } break;
+        case INPUT_SHIFT_RIGHT:
+        {
+            shift_x += 190;
+            redraw (images[0], coordinates, shift_x, shift_y, scale, R, color_scheme[0]);
+            s = 0;
+            draw_rectangle (images[2], 86, 19, 62, 18, 0xffffff);
+            draw_rectangle (images[2], 411, 21, 80, 21, 0xffffff);
+            draw_rectangle (images[2], 509, 21, 85, 21, 0xffffff);
+            draw_double (images[2], coordinates[0].xn, 375, 13);
+            draw_double (images[2], coordinates[images[0].w - 1].xn + 1.0/(images[0].w* scale), 468, 13);
+        } break;
+        case INPUT_FREEZE_UNFREEZE:
+        {
+            if (freeze_flag == false) freeze_flag = true;
+            else freeze_flag = false;
+        } break;
+        case INPUT_ZOOM_IN:
+        {
+            if (scale == 0.25) scale = 0.5;
+            else if (scale == 0.5) scale = 1;
+            else scale = scale*2;
+            redraw (images[0], coordinates, shift_x, shift_y, scale, R, color_scheme[0]);
+            s = 0;
+            draw_rectangle (images[2], 86, 19, 62, 18, 0xffffff);
+            draw_rectangle (images[2], 411, 21, 80, 21, 0xffffff);
+            draw_rectangle (images[2], 509, 21, 85, 21, 0xffffff);
+            draw_double (images[2], coordinates[0].xn, 375, 13);
+            draw_double (images[2], coordinates[images[0].w - 1].xn + 1.0/(images[0].w* scale), 468, 13);
+            draw_rectangle (images[2], 627, 19, 83, 21, 0xffffff);
+            draw_rectangle (images[2], 720, 19, 78, 21, 0xffffff);
+            draw_double (images[2], coordinates[0].yn, 589, 13);
+            draw_double (images[2], coordinates[images[0].w * images[0].h - 1].yn + 1.0/(images[0].h* scale), 683, 13);
+
+        } break;
+        case INPUT_ZOOM_OUT:
+        {
+            if (scale > 0.25)
             {
-              redraw (images[0], coordinates, shift_x, shift_y, x_step, y_step, R, color_scheme[0]);
-              s = 0;
-            } break;
-          case INPUT_INCREASE_SPEED:
+                if (scale > 1) scale = scale/2;
+                else if (scale == 1) scale = 0.5;
+                else scale = 0.25;
+                redraw (images[0], coordinates, shift_x, shift_y, scale, R, color_scheme[0]);
+                s = 0;
+                draw_rectangle (images[2], 86, 19, 62, 18, 0xffffff);
+                draw_rectangle (images[2], 411, 21, 80, 21, 0xffffff);
+                draw_rectangle (images[2], 509, 21, 85, 21, 0xffffff);
+                draw_double (images[2], coordinates[0].xn, 375, 13);
+                draw_double (images[2], coordinates[images[0].w - 1].xn + 1.0/(images[0].w* scale), 468, 13);
+                draw_rectangle (images[2], 627, 19, 83, 21, 0xffffff);
+                draw_rectangle (images[2], 720, 19, 78, 21, 0xffffff);
+                draw_double (images[2], coordinates[0].yn, 589, 13);
+                draw_double (images[2], coordinates[images[0].w * images[0].h - 1].yn + 1.0/(images[0].h* scale), 683, 13);
+            }
+        } break;
+        case INPUT_RESET_SCALE:
+        {
+            if (scale != 0.25 || shift_x != 380 || shift_y != 380)
             {
-              if (frame_time > 0) frame_time = frame_time - 10;
-            } break;
-          case INPUT_DECREASE_SPEED:
+                scale = 0.25;
+                shift_x = 380;
+                shift_y = 380;
+                redraw (images[0], coordinates, shift_x, shift_y, scale, R, color_scheme[0]);
+                s = 0;
+                draw_rectangle (images[2], 86, 19, 62, 18, 0xffffff);
+                draw_rectangle (images[2], 411, 21, 80, 21, 0xffffff);
+                draw_rectangle (images[2], 509, 21, 85, 21, 0xffffff);
+                draw_double (images[2], coordinates[0].xn, 375, 13);
+                draw_double (images[2], coordinates[images[0].w - 1].xn + 1.0/(images[0].w* scale), 468, 13);
+                draw_rectangle (images[2], 627, 19, 83, 21, 0xffffff);
+                draw_rectangle (images[2], 720, 19, 78, 21, 0xffffff);
+                draw_double (images[2], coordinates[0].yn, 589, 13);
+                draw_double (images[2], coordinates[images[0].w * images[0].h - 1].yn + 1.0/(images[0].h* scale), 683, 13);
+            }
+        } break;
+        case INPUT_CONSTANT:
+        {
+            constant_pool_num = (constant_pool_num +1)%14;
+            constant_x = constant_pool[constant_pool_num][0];
+            constant_y = constant_pool[constant_pool_num][1];
+            redraw (images[0], coordinates, shift_x, shift_y, scale, R, color_scheme[0]);
+            s = 0;
+            draw_rectangle (images[2], 86, 19, 62, 18, 0xffffff);
+            draw_rectangle (images[2], 197, 19, 75, 23, 0xffffff);
+            draw_rectangle (images[2], 282, 22, 71, 23, 0xffffff);
+            draw_double (images[2], constant_x, 166, 13);
+            draw_double (images[2], constant_y, 251, 13);
+        } break;
+        case INPUT_COLOR_1:
+        {
+            hex_color1 = hex_color1 + 0x000040;
+            draw_square (images[3], 45, 20, 30, hex_color1);
+            c1 = to_color (hex_color1);
+            r1 = c1.r;
+            g1 = c1.g;
+            b1 = c1.b;
+            for (u8 i = 0; i<60; i++)
             {
-              frame_time = frame_time + 10;
-            } break;
-          case INPUT_RESET_SPEED:
+                if (i < 20)
+                {
+                    r64 t = i/20.0;
+                    color_scheme[i].r = (1-t)*r1 + t*r2;
+                    color_scheme[i].g = (1-t)*g1 + t*g2;
+                    color_scheme[i].b = (1-t)*b1 + t*b2;
+                }
+                else if (i >= 20 && i < 40)
+                {
+
+                }
+                else
+                {
+                    r64 t = (i-40.0)/20.0;
+                    color_scheme[i].r = (1-t)*r3 + t*r1;
+                    color_scheme[i].g = (1-t)*g3 + t*g1;
+                    color_scheme[i].b = (1-t)*b3 + t*b1;
+                }
+
+            }
+
+            redraw (images[0], coordinates, shift_x, shift_y, scale, R, color_scheme[0]);
+            s = 0;
+            draw_rectangle (images[2], 86, 19, 62, 18, 0xffffff);
+        } break;
+        case INPUT_COLOR_2:
+        {
+            hex_color2 = hex_color2 + 0x000040;
+            draw_square (images[3], 85, 20, 30, hex_color2);
+            c2 = to_color (hex_color2);
+            r2 = c2.r;
+            g2 = c2.g;
+            b2 = c2.b;
+            for (u8 i = 0; i<40; i++)
             {
-              frame_time = 0;
-            } break;
-          case INPUT_SHIFT_UP:
+                if (i < 20)
+                {
+                    r64 t = i/20.0;
+                    color_scheme[i].r = (1-t)*r1 + t*r2;
+                    color_scheme[i].g = (1-t)*g1 + t*g2;
+                    color_scheme[i].b = (1-t)*b1 + t*b2;
+                }
+                else if (i >= 20 && i < 40)
+                {
+                    r64 t = (i-20.0)/20.0;
+                    color_scheme[i].r = (1-t)*r2 + t*r3;
+                    color_scheme[i].g = (1-t)*g2 + t*g3;
+                    color_scheme[i].b = (1-t)*b2 + t*b3;
+                }
+
+            }
+            redraw (images[0], coordinates, shift_x, shift_y, scale, R, color_scheme[0]);
+            s = 0;
+            draw_rectangle (images[2], 86, 19, 62, 18, 0xffffff);
+        } break;
+        case INPUT_COLOR_3:
+        {
+            hex_color3 = hex_color3 + 0x000040;
+            draw_square (images[3], 125, 20, 30, hex_color3);
+            c3 = to_color (hex_color3);
+            r3 = c3.r;
+            g3 = c3.g;
+            b3 = c3.b;
+            for (u8 i = 20; i<60; i++)
             {
-              shift_y += 190;
-              redraw (images[0], coordinates, shift_x, shift_y, x_step, y_step, R, color_scheme[0]);
-              s = 0;
-            } break;
-          case INPUT_SHIFT_DOWN:
+                if (i >= 20 && i < 40)
+                {
+                    r64 t = (i-20.0)/20.0;
+                    color_scheme[i].r = (1-t)*r2 + t*r3;
+                    color_scheme[i].g = (1-t)*g2 + t*g3;
+                    color_scheme[i].b = (1-t)*b2 + t*b3;
+                }
+                else
+                {
+                    r64 t = (i-40.0)/20.0;
+                    color_scheme[i].r = (1-t)*r3 + t*r1;
+                    color_scheme[i].g = (1-t)*g3 + t*g1;
+                    color_scheme[i].b = (1-t)*b3 + t*b1;
+                }
+
+            }
+            redraw (images[0], coordinates, shift_x, shift_y, scale, R, color_scheme[0]);
+            s = 0;
+            draw_rectangle (images[2], 86, 19, 62, 18, 0xffffff);
+        } break;
+        case INPUT_RESET_COLORS:
+        {
+            hex_color1 = 0x0000ff;
+            hex_color2 = 0xffffff;
+            hex_color3 = 0xffa000;
+            draw_square (images[3], 45, 20, 30, hex_color1);
+            draw_square (images[3], 85, 20, 30, hex_color2);
+            draw_square (images[3], 125, 20, 30, hex_color3);
+            c1 = to_color (hex_color1);
+            c2 = to_color (hex_color2);
+            c3 = to_color (hex_color3);
+            r1 = c1.r;
+            g1 = c1.g;
+            b1 = c1.b;
+            r2 = c2.r;
+            g2 = c2.g;
+            b2 = c2.b;
+            r3 = c3.r;
+            g3 = c3.g;
+            b3 = c3.b;
+            for (u8 i = 0; i<60; i++)
             {
-              shift_y -= 190;
-              redraw (images[0], coordinates, shift_x, shift_y, x_step, y_step, R, color_scheme[0]);
-              s = 0;
-            } break;
-          case INPUT_SHIFT_LEFT:
+                if (i < 20)
+                {
+                    r64 t = i/20.0;
+                    color_scheme[i].r = (1-t)*r1 + t*r2;
+                    color_scheme[i].g = (1-t)*g1 + t*g2;
+                    color_scheme[i].b = (1-t)*b1 + t*b2;
+                }
+                else if (i >= 20 && i < 40)
+                {
+                    r64 t = (i-20.0)/20.0;
+                    color_scheme[i].r = (1-t)*r2 + t*r3;
+                    color_scheme[i].g = (1-t)*g2 + t*g3;
+                    color_scheme[i].b = (1-t)*b2 + t*b3;
+                }
+                else
+                {
+                    r64 t = (i-40.0)/20.0;
+                    color_scheme[i].r = (1-t)*r3 + t*r1;
+                    color_scheme[i].g = (1-t)*g3 + t*g1;
+                    color_scheme[i].b = (1-t)*b3 + t*b1;
+                }
+
+            }
+            redraw (images[0], coordinates, shift_x, shift_y, scale, R, color_scheme[0]);
+            s = 0;
+            draw_rectangle (images[2], 86, 19, 62, 18, 0xffffff);
+        } break;
+        case INPUT_TOTAL_RESET:
+        {
+            freeze_flag = false;
+            frame_time = 0;
+            scale = 0.25;
+            shift_x = 380;
+            shift_y = 380;
+            constant_pool_num = 0;
+            constant_x = constant_pool[constant_pool_num][0];
+            constant_y = constant_pool[constant_pool_num][1];
+            hex_color1 = 0x0000ff;
+            hex_color2 = 0xffffff;
+            hex_color3 = 0xffa000;
+            draw_square (images[3], 45, 20, 30, hex_color1);
+            draw_square (images[3], 85, 20, 30, hex_color2);
+            draw_square (images[3], 125, 20, 30, hex_color3);
+            c1 = to_color (hex_color1);
+            c2 = to_color (hex_color2);
+            c3 = to_color (hex_color3);
+            r1 = c1.r;
+            g1 = c1.g;
+            b1 = c1.b;
+            r2 = c2.r;
+            g2 = c2.g;
+            b2 = c2.b;
+            r3 = c3.r;
+            g3 = c3.g;
+            b3 = c3.b;
+            for (u8 i = 0; i<60; i++)
             {
-              shift_x -= 190;
-              redraw (images[0], coordinates, shift_x, shift_y, x_step, y_step, R, color_scheme[0]);
-              s = 0;
-            } break;
-          case INPUT_SHIFT_RIGHT:
-            {
-              shift_x += 190;
-              redraw (images[0], coordinates, shift_x, shift_y, x_step, y_step, R, color_scheme[0]);
-              s = 0;
-            } break;
-          }
+                if (i < 20)
+                {
+                    r64 t = i/20.0;
+                    color_scheme[i].r = (1-t)*r1 + t*r2;
+                    color_scheme[i].g = (1-t)*g1 + t*g2;
+                    color_scheme[i].b = (1-t)*b1 + t*b2;
+                }
+                else if (i >= 20 && i < 40)
+                {
+                    r64 t = (i-20.0)/20.0;
+                    color_scheme[i].r = (1-t)*r2 + t*r3;
+                    color_scheme[i].g = (1-t)*g2 + t*g3;
+                    color_scheme[i].b = (1-t)*b2 + t*b3;
+                }
+                else
+                {
+                    r64 t = (i-40.0)/20.0;
+                    color_scheme[i].r = (1-t)*r3 + t*r1;
+                    color_scheme[i].g = (1-t)*g3 + t*g1;
+                    color_scheme[i].b = (1-t)*b3 + t*b1;
+                }
+
+            }
+            redraw (images[0], coordinates, shift_x, shift_y, scale, R, color_scheme[0]);
+            s = 0;
+            draw_rectangle (images[2], 86, 19, 62, 18, 0xffffff);
+            draw_rectangle (images[2], 411, 21, 80, 21, 0xffffff);
+            draw_rectangle (images[2], 509, 21, 85, 21, 0xffffff);
+            draw_double (images[2], coordinates[0].xn, 375, 13);
+            draw_double (images[2], coordinates[images[0].w - 1].xn + 1.0/(images[0].w* scale), 468, 13);
+            draw_rectangle (images[2], 627, 19, 83, 21, 0xffffff);
+            draw_rectangle (images[2], 720, 19, 78, 21, 0xffffff);
+            draw_double (images[2], coordinates[0].yn, 589, 13);
+            draw_double (images[2], coordinates[images[0].w * images[0].h - 1].yn + 1.0/(images[0].h* scale), 683, 13);
+
+        } break;
+        }
+
+
 
         glClear (GL_COLOR_BUFFER_BIT);
 
-        V3 *pointer = images[0].pixels;
-        for (s32 y = 0; y < image_h; y++)
-          {
-            for (s32 x = 0; x < image_w; x++)
-              {
-                if (coordinates[y*image_w+x].xn*coordinates[y*image_w+x].xn + coordinates[y*image_w+x].yn*coordinates[y*image_w+x].yn <= R)
-                  {
-                    r64 x_test = coordinates[y*image_w+x].xn;
-                    r64 y_test = coordinates[y*image_w+x].yn;
-                    coordinates[y*image_w+x].yn = 2*x_test * y_test + constant_y;
-                    coordinates[y*image_w+x].xn = x_test*x_test - y_test*y_test + constant_x;
+        if (freeze_flag == false)
+        {
+            V3 *pointer = images[0].pixels;
+            for (s32 y = 0; y < image_h; y++)
+            {
+                for (s32 x = 0; x < image_w; x++)
+                {
+                    if (coordinates[y*image_w+x].xn*coordinates[y*image_w+x].xn + coordinates[y*image_w+x].yn*coordinates[y*image_w+x].yn <= R)
+                    {
+                        r64 x_test = coordinates[y*image_w+x].xn;
+                        r64 y_test = coordinates[y*image_w+x].yn;
+                        coordinates[y*image_w+x].yn = 2*x_test * y_test + constant_y;
+                        coordinates[y*image_w+x].xn = x_test*x_test - y_test*y_test + constant_x;
 
-                    if (coordinates[y*image_w+x].xn*coordinates[y*image_w+x].xn + coordinates[y*image_w+x].yn*coordinates[y*image_w+x].yn > R)
-                      {
-                        u32 draw_step = s % 60;
-                        *pointer = color_scheme[draw_step];
-                      }
-                  }
+                        if (coordinates[y*image_w+x].xn*coordinates[y*image_w+x].xn + coordinates[y*image_w+x].yn*coordinates[y*image_w+x].yn > R)
+                        {
+                            u32 draw_step = s % 60;
+                            *pointer = color_scheme[draw_step];
+                        }
+                    }
 
-                pointer++;
-              }
-          }
+                    pointer++;
+                }
+            }
+
+
+            draw_integer(images[2], s);
+            ++s;
+        }
 
         for (u32 i = 0; i < images_count; ++i)
-          {
+        {
             update_image_texture (images[i]);
             show_image           (images[i]);
-          }
+        }
 
-        ++s;
+
+
         SDL_Delay(frame_time);
         SDL_GL_SwapWindow (main_window);
-      }
+    }
 
     return 0;
 }
