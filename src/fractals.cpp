@@ -207,6 +207,63 @@ redraw (Image image,
 }
 
 
+static void
+set_colors (V3 *color_scheme, u32 hex_color1, u32 hex_color2, u32 hex_color3)
+{
+    V3 c1 = to_color (hex_color1);
+    V3 c2 = to_color (hex_color2);
+    V3 c3 = to_color (hex_color3);
+    u8 r1 = c1.r;
+    u8 g1 = c1.g;
+    u8 b1 = c1.b;
+    u8 r2 = c2.r;
+    u8 g2 = c2.g;
+    u8 b2 = c2.b;
+    u8 r3 = c3.r;
+    u8 g3 = c3.g;
+    u8 b3 = c3.b;
+    for (u8 i = 0; i<60; i++)
+    {
+        if (i < 20)
+        {
+            r64 t = i/20.0;
+            color_scheme[i].r = (1-t)*r1 + t*r2;
+            color_scheme[i].g = (1-t)*g1 + t*g2;
+            color_scheme[i].b = (1-t)*b1 + t*b2;
+        }
+        else if (i >= 20 && i < 40)
+        {
+            r64 t = (i-20.0)/20.0;
+            color_scheme[i].r = (1-t)*r2 + t*r3;
+            color_scheme[i].g = (1-t)*g2 + t*g3;
+            color_scheme[i].b = (1-t)*b2 + t*b3;
+        }
+        else
+        {
+            r64 t = (i-40.0)/20.0;
+            color_scheme[i].r = (1-t)*r3 + t*r1;
+            color_scheme[i].g = (1-t)*g3 + t*g1;
+            color_scheme[i].b = (1-t)*b3 + t*b1;
+        }
+    }
+}
+
+u32 color_modification (u32 hex_color)
+{
+    V3 set = to_color(hex_color);
+    if (set.r == 255 && set.g == 0 && set.b < 255) set.b +=5;
+    else if (set.r > 0 && set.g ==0 && set.b == 255) set.r = set.r - 5;
+    else if (set.r == 0 && set.g < 255 && set.b == 255) set.g+=5;
+    else if (set.r ==0 && set.g == 255 && set.b > 0) set.b = set.b - 5;
+    else if (set.r < 255 && set.g == 255 && set.b == 0) set.r+=5;
+    else if (set.r == 255 && set.g > 0 && set.b == 0) set.g = set.g - 5;
+    else
+    {set.r +=51; set.g+=51; set.b+=51;}
+    hex_color = set.r*256*256 + set.g*256 +set.b;
+
+    return hex_color;
+}
+
 int
 main (int argc, char **argv)
 {
@@ -249,43 +306,8 @@ main (int argc, char **argv)
     u32 hex_color1 = 0x0000ff;
     u32 hex_color2 = 0xffffff;
     u32 hex_color3 = 0xffa000;
-    V3 c1 = to_color (hex_color1);
-    V3 c2 = to_color (hex_color2);
-    V3 c3 = to_color (hex_color3);
-    u8 r1 = c1.r;
-    u8 g1 = c1.g;
-    u8 b1 = c1.b;
-    u8 r2 = c2.r;
-    u8 g2 = c2.g;
-    u8 b2 = c2.b;
-    u8 r3 = c3.r;
-    u8 g3 = c3.g;
-    u8 b3 = c3.b;
-    for (u8 i = 0; i<60; i++)
-    {
-        if (i < 20)
-        {
-            r64 t = i/20.0;
-            color_scheme[i].r = (1-t)*r1 + t*r2;
-            color_scheme[i].g = (1-t)*g1 + t*g2;
-            color_scheme[i].b = (1-t)*b1 + t*b2;
-        }
-        else if (i >= 20 && i < 40)
-        {
-            r64 t = (i-20.0)/20.0;
-            color_scheme[i].r = (1-t)*r2 + t*r3;
-            color_scheme[i].g = (1-t)*g2 + t*g3;
-            color_scheme[i].b = (1-t)*b2 + t*b3;
-        }
-        else
-        {
-            r64 t = (i-40.0)/20.0;
-            color_scheme[i].r = (1-t)*r3 + t*r1;
-            color_scheme[i].g = (1-t)*g3 + t*g1;
-            color_scheme[i].b = (1-t)*b3 + t*b1;
-        }
+    set_colors (color_scheme, hex_color1, hex_color2, hex_color3);
 
-    }
 
     draw_square (images[3], 45, 20, 32, 0x000000);
     draw_square (images[3], 85, 20, 32, 0x000000);
@@ -294,7 +316,11 @@ main (int argc, char **argv)
     draw_square (images[3], 85, 20, 30, hex_color2);
     draw_square (images[3], 125, 20, 30, hex_color3);
 
-    r64 constant_pool[14][2] = {{0.285, 0.01},{0.28, 0.0113},{0.285, 0}, {0.45, 0.1428}, {-0.0085, 0.71},{-0.1, 0.651},{-0.382, 0.618},{-0.618, 0},{-0.74543, 0.11301},{- 0.8, 0.156},{-0.70176, -0.3842}, {-0.835, -0.2321},{ -0.7269, 0.1889}, {0, -0.8}};
+    r64 constant_pool[14][2] = {{0.285, 0.01},{0.28, 0.0113},{0.285, 0},
+                                {0.45, 0.1428}, {-0.0085, 0.71},{-0.1, 0.651},
+                                {-0.382, 0.618},{-0.618, 0},{-0.74543, 0.11301},
+                                {- 0.8, 0.156},{-0.70176, -0.3842}, {-0.835, -0.2321},
+                                { -0.7269, 0.1889}, {0, -0.8}};
     u32 constant_pool_num = 0;
 
 
@@ -349,7 +375,8 @@ main (int argc, char **argv)
             {
                 keep_running = 0;
                 break;
-            }
+            } break;
+
             case SDL_KEYDOWN:
             {
                 if (event.type == SDL_KEYDOWN)
@@ -376,7 +403,7 @@ main (int argc, char **argv)
                     case SDLK_r:            input = INPUT_TOTAL_RESET; break;
                     }
                 }
-            }
+            } break;
             }
         }
 
@@ -385,6 +412,7 @@ main (int argc, char **argv)
         case INPUT_NONE: break;
         case INPUT_REDRAW:
         {
+            freeze_flag = false;
             redraw (images[0], coordinates, shift_x, shift_y, scale, R, color_scheme[0]);
             s = 0;
             draw_rectangle (images[2], 86, 19, 62, 18, 0xffffff);
@@ -403,6 +431,7 @@ main (int argc, char **argv)
         } break;
         case INPUT_SHIFT_UP:
         {
+            freeze_flag = false;
             shift_y += 190;
             redraw (images[0], coordinates, shift_x, shift_y, scale, R, color_scheme[0]);
             s = 0;
@@ -414,6 +443,7 @@ main (int argc, char **argv)
         } break;
         case INPUT_SHIFT_DOWN:
         {
+            freeze_flag = false;
             shift_y -= 190;
             redraw (images[0], coordinates, shift_x, shift_y, scale, R, color_scheme[0]);
             s = 0;
@@ -425,6 +455,7 @@ main (int argc, char **argv)
         } break;
         case INPUT_SHIFT_LEFT:
         {
+            freeze_flag = false;
             shift_x -= 190;
             redraw (images[0], coordinates, shift_x, shift_y, scale, R, color_scheme[0]);
             s = 0;
@@ -436,6 +467,7 @@ main (int argc, char **argv)
         } break;
         case INPUT_SHIFT_RIGHT:
         {
+            freeze_flag = false;
             shift_x += 190;
             redraw (images[0], coordinates, shift_x, shift_y, scale, R, color_scheme[0]);
             s = 0;
@@ -452,9 +484,8 @@ main (int argc, char **argv)
         } break;
         case INPUT_ZOOM_IN:
         {
-            if (scale == 0.25) scale = 0.5;
-            else if (scale == 0.5) scale = 1;
-            else scale = scale*2;
+            freeze_flag = false;
+            scale = scale*2;
             redraw (images[0], coordinates, shift_x, shift_y, scale, R, color_scheme[0]);
             s = 0;
             draw_rectangle (images[2], 86, 19, 62, 18, 0xffffff);
@@ -470,26 +501,23 @@ main (int argc, char **argv)
         } break;
         case INPUT_ZOOM_OUT:
         {
-            if (scale > 0.25)
-            {
-                if (scale > 1) scale = scale/2;
-                else if (scale == 1) scale = 0.5;
-                else scale = 0.25;
-                redraw (images[0], coordinates, shift_x, shift_y, scale, R, color_scheme[0]);
-                s = 0;
-                draw_rectangle (images[2], 86, 19, 62, 18, 0xffffff);
-                draw_rectangle (images[2], 411, 21, 80, 21, 0xffffff);
-                draw_rectangle (images[2], 509, 21, 85, 21, 0xffffff);
-                draw_double (images[2], coordinates[0].xn, 375, 13);
-                draw_double (images[2], coordinates[images[0].w - 1].xn + 1.0/(images[0].w* scale), 468, 13);
-                draw_rectangle (images[2], 627, 19, 83, 21, 0xffffff);
-                draw_rectangle (images[2], 720, 19, 78, 21, 0xffffff);
-                draw_double (images[2], coordinates[0].yn, 589, 13);
-                draw_double (images[2], coordinates[images[0].w * images[0].h - 1].yn + 1.0/(images[0].h* scale), 683, 13);
-            }
+            freeze_flag = false;
+            scale = scale/2;
+            redraw (images[0], coordinates, shift_x, shift_y, scale, R, color_scheme[0]);
+            s = 0;
+            draw_rectangle (images[2], 86, 19, 62, 18, 0xffffff);
+            draw_rectangle (images[2], 411, 21, 80, 21, 0xffffff);
+            draw_rectangle (images[2], 509, 21, 85, 21, 0xffffff);
+            draw_double (images[2], coordinates[0].xn, 375, 13);
+            draw_double (images[2], coordinates[images[0].w - 1].xn + 1.0/(images[0].w* scale), 468, 13);
+            draw_rectangle (images[2], 627, 19, 83, 21, 0xffffff);
+            draw_rectangle (images[2], 720, 19, 78, 21, 0xffffff);
+            draw_double (images[2], coordinates[0].yn, 589, 13);
+            draw_double (images[2], coordinates[images[0].w * images[0].h - 1].yn + 1.0/(images[0].h* scale), 683, 13);
         } break;
         case INPUT_RESET_SCALE:
         {
+            freeze_flag = false;
             if (scale != 0.25 || shift_x != 380 || shift_y != 380)
             {
                 scale = 0.25;
@@ -510,6 +538,7 @@ main (int argc, char **argv)
         } break;
         case INPUT_CONSTANT:
         {
+            freeze_flag = false;
             constant_pool_num = (constant_pool_num +1)%14;
             constant_x = constant_pool[constant_pool_num][0];
             constant_y = constant_pool[constant_pool_num][1];
@@ -524,98 +553,22 @@ main (int argc, char **argv)
         } break;
         case INPUT_COLOR_1:
         {
-            hex_color1 = hex_color1 + 0x000040;
+
+            hex_color1 = color_modification(hex_color1);
             draw_square (images[3], 45, 20, 30, hex_color1);
-            c1 = to_color (hex_color1);
-            r1 = c1.r;
-            g1 = c1.g;
-            b1 = c1.b;
-            for (u8 i = 0; i<60; i++)
-            {
-                if (i < 20)
-                {
-                    r64 t = i/20.0;
-                    color_scheme[i].r = (1-t)*r1 + t*r2;
-                    color_scheme[i].g = (1-t)*g1 + t*g2;
-                    color_scheme[i].b = (1-t)*b1 + t*b2;
-                }
-                else if (i >= 20 && i < 40)
-                {
-
-                }
-                else
-                {
-                    r64 t = (i-40.0)/20.0;
-                    color_scheme[i].r = (1-t)*r3 + t*r1;
-                    color_scheme[i].g = (1-t)*g3 + t*g1;
-                    color_scheme[i].b = (1-t)*b3 + t*b1;
-                }
-
-            }
-
-            redraw (images[0], coordinates, shift_x, shift_y, scale, R, color_scheme[0]);
-            s = 0;
-            draw_rectangle (images[2], 86, 19, 62, 18, 0xffffff);
+            set_colors (color_scheme, hex_color1, hex_color2, hex_color3);
         } break;
         case INPUT_COLOR_2:
         {
-            hex_color2 = hex_color2 + 0x000040;
+            hex_color2 = color_modification(hex_color2);
             draw_square (images[3], 85, 20, 30, hex_color2);
-            c2 = to_color (hex_color2);
-            r2 = c2.r;
-            g2 = c2.g;
-            b2 = c2.b;
-            for (u8 i = 0; i<40; i++)
-            {
-                if (i < 20)
-                {
-                    r64 t = i/20.0;
-                    color_scheme[i].r = (1-t)*r1 + t*r2;
-                    color_scheme[i].g = (1-t)*g1 + t*g2;
-                    color_scheme[i].b = (1-t)*b1 + t*b2;
-                }
-                else if (i >= 20 && i < 40)
-                {
-                    r64 t = (i-20.0)/20.0;
-                    color_scheme[i].r = (1-t)*r2 + t*r3;
-                    color_scheme[i].g = (1-t)*g2 + t*g3;
-                    color_scheme[i].b = (1-t)*b2 + t*b3;
-                }
-
-            }
-            redraw (images[0], coordinates, shift_x, shift_y, scale, R, color_scheme[0]);
-            s = 0;
-            draw_rectangle (images[2], 86, 19, 62, 18, 0xffffff);
+            set_colors (color_scheme, hex_color1, hex_color2, hex_color3);
         } break;
         case INPUT_COLOR_3:
         {
-            hex_color3 = hex_color3 + 0x000040;
+            hex_color3 = color_modification(hex_color3);
             draw_square (images[3], 125, 20, 30, hex_color3);
-            c3 = to_color (hex_color3);
-            r3 = c3.r;
-            g3 = c3.g;
-            b3 = c3.b;
-            for (u8 i = 20; i<60; i++)
-            {
-                if (i >= 20 && i < 40)
-                {
-                    r64 t = (i-20.0)/20.0;
-                    color_scheme[i].r = (1-t)*r2 + t*r3;
-                    color_scheme[i].g = (1-t)*g2 + t*g3;
-                    color_scheme[i].b = (1-t)*b2 + t*b3;
-                }
-                else
-                {
-                    r64 t = (i-40.0)/20.0;
-                    color_scheme[i].r = (1-t)*r3 + t*r1;
-                    color_scheme[i].g = (1-t)*g3 + t*g1;
-                    color_scheme[i].b = (1-t)*b3 + t*b1;
-                }
-
-            }
-            redraw (images[0], coordinates, shift_x, shift_y, scale, R, color_scheme[0]);
-            s = 0;
-            draw_rectangle (images[2], 86, 19, 62, 18, 0xffffff);
+            set_colors (color_scheme, hex_color1, hex_color2, hex_color3);
         } break;
         case INPUT_RESET_COLORS:
         {
@@ -625,46 +578,7 @@ main (int argc, char **argv)
             draw_square (images[3], 45, 20, 30, hex_color1);
             draw_square (images[3], 85, 20, 30, hex_color2);
             draw_square (images[3], 125, 20, 30, hex_color3);
-            c1 = to_color (hex_color1);
-            c2 = to_color (hex_color2);
-            c3 = to_color (hex_color3);
-            r1 = c1.r;
-            g1 = c1.g;
-            b1 = c1.b;
-            r2 = c2.r;
-            g2 = c2.g;
-            b2 = c2.b;
-            r3 = c3.r;
-            g3 = c3.g;
-            b3 = c3.b;
-            for (u8 i = 0; i<60; i++)
-            {
-                if (i < 20)
-                {
-                    r64 t = i/20.0;
-                    color_scheme[i].r = (1-t)*r1 + t*r2;
-                    color_scheme[i].g = (1-t)*g1 + t*g2;
-                    color_scheme[i].b = (1-t)*b1 + t*b2;
-                }
-                else if (i >= 20 && i < 40)
-                {
-                    r64 t = (i-20.0)/20.0;
-                    color_scheme[i].r = (1-t)*r2 + t*r3;
-                    color_scheme[i].g = (1-t)*g2 + t*g3;
-                    color_scheme[i].b = (1-t)*b2 + t*b3;
-                }
-                else
-                {
-                    r64 t = (i-40.0)/20.0;
-                    color_scheme[i].r = (1-t)*r3 + t*r1;
-                    color_scheme[i].g = (1-t)*g3 + t*g1;
-                    color_scheme[i].b = (1-t)*b3 + t*b1;
-                }
-
-            }
-            redraw (images[0], coordinates, shift_x, shift_y, scale, R, color_scheme[0]);
-            s = 0;
-            draw_rectangle (images[2], 86, 19, 62, 18, 0xffffff);
+            set_colors (color_scheme, hex_color1, hex_color2, hex_color3);
         } break;
         case INPUT_TOTAL_RESET:
         {
@@ -683,43 +597,7 @@ main (int argc, char **argv)
             draw_square (images[3], 45, 20, 30, hex_color1);
             draw_square (images[3], 85, 20, 30, hex_color2);
             draw_square (images[3], 125, 20, 30, hex_color3);
-            c1 = to_color (hex_color1);
-            c2 = to_color (hex_color2);
-            c3 = to_color (hex_color3);
-            r1 = c1.r;
-            g1 = c1.g;
-            b1 = c1.b;
-            r2 = c2.r;
-            g2 = c2.g;
-            b2 = c2.b;
-            r3 = c3.r;
-            g3 = c3.g;
-            b3 = c3.b;
-            for (u8 i = 0; i<60; i++)
-            {
-                if (i < 20)
-                {
-                    r64 t = i/20.0;
-                    color_scheme[i].r = (1-t)*r1 + t*r2;
-                    color_scheme[i].g = (1-t)*g1 + t*g2;
-                    color_scheme[i].b = (1-t)*b1 + t*b2;
-                }
-                else if (i >= 20 && i < 40)
-                {
-                    r64 t = (i-20.0)/20.0;
-                    color_scheme[i].r = (1-t)*r2 + t*r3;
-                    color_scheme[i].g = (1-t)*g2 + t*g3;
-                    color_scheme[i].b = (1-t)*b2 + t*b3;
-                }
-                else
-                {
-                    r64 t = (i-40.0)/20.0;
-                    color_scheme[i].r = (1-t)*r3 + t*r1;
-                    color_scheme[i].g = (1-t)*g3 + t*g1;
-                    color_scheme[i].b = (1-t)*b3 + t*b1;
-                }
-
-            }
+            set_colors (color_scheme, hex_color1, hex_color2, hex_color3);
             redraw (images[0], coordinates, shift_x, shift_y, scale, R, color_scheme[0]);
             s = 0;
             draw_rectangle (images[2], 86, 19, 62, 18, 0xffffff);
@@ -733,55 +611,55 @@ main (int argc, char **argv)
             draw_double (images[2], coordinates[images[0].w * images[0].h - 1].yn + 1.0/(images[0].h* scale), 683, 13);
 
         } break;
-        }
-
-
-
-        glClear (GL_COLOR_BUFFER_BIT);
-
-        if (freeze_flag == false)
-        {
-            V3 *pointer = images[0].pixels;
-            for (s32 y = 0; y < image_h; y++)
-            {
-                for (s32 x = 0; x < image_w; x++)
-                {
-                    if (coordinates[y*image_w+x].xn*coordinates[y*image_w+x].xn + coordinates[y*image_w+x].yn*coordinates[y*image_w+x].yn <= R)
-                    {
-                        r64 x_test = coordinates[y*image_w+x].xn;
-                        r64 y_test = coordinates[y*image_w+x].yn;
-                        coordinates[y*image_w+x].yn = 2*x_test * y_test + constant_y;
-                        coordinates[y*image_w+x].xn = x_test*x_test - y_test*y_test + constant_x;
-
-                        if (coordinates[y*image_w+x].xn*coordinates[y*image_w+x].xn + coordinates[y*image_w+x].yn*coordinates[y*image_w+x].yn > R)
-                        {
-                            u32 draw_step = s % 60;
-                            *pointer = color_scheme[draw_step];
-                        }
-                    }
-
-                    pointer++;
-                }
-            }
-
-
-            draw_integer(images[2], s);
-            ++s;
-        }
-
-        for (u32 i = 0; i < images_count; ++i)
-        {
-            update_image_texture (images[i]);
-            show_image           (images[i]);
-        }
-
-
-
-        SDL_Delay(frame_time);
-        SDL_GL_SwapWindow (main_window);
     }
 
-    return 0;
+
+
+    glClear (GL_COLOR_BUFFER_BIT);
+
+    if (freeze_flag == false)
+    {
+        V3 *pointer = images[0].pixels;
+        for (s32 y = 0; y < image_h; y++)
+        {
+            for (s32 x = 0; x < image_w; x++)
+            {
+                if (coordinates[y*image_w+x].xn*coordinates[y*image_w+x].xn + coordinates[y*image_w+x].yn*coordinates[y*image_w+x].yn <= R)
+                {
+                    r64 x_test = coordinates[y*image_w+x].xn;
+                    r64 y_test = coordinates[y*image_w+x].yn;
+                    coordinates[y*image_w+x].yn = 2*x_test * y_test + constant_y;
+                    coordinates[y*image_w+x].xn = x_test*x_test - y_test*y_test + constant_x;
+
+                    if (coordinates[y*image_w+x].xn*coordinates[y*image_w+x].xn + coordinates[y*image_w+x].yn*coordinates[y*image_w+x].yn > R)
+                    {
+                        u32 draw_step = s % 60;
+                        *pointer = color_scheme[draw_step];
+                    }
+                }
+
+                pointer++;
+            }
+        }
+
+
+        draw_integer(images[2], s);
+        ++s;
+    }
+
+    for (u32 i = 0; i < images_count; ++i)
+    {
+        update_image_texture (images[i]);
+        show_image           (images[i]);
+    }
+
+
+
+    SDL_Delay(frame_time);
+    SDL_GL_SwapWindow (main_window);
+}
+
+return 0;
 }
 
 
