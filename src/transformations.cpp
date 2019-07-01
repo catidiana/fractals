@@ -69,8 +69,8 @@ V2 horseshoe (V2 coord)
     else if (coord.y>0) alfa = M_PI/2;
     else if (coord.y<0) alfa = - M_PI/2;
     else alfa = 0;
-    coord2.x = R*cos(4*alfa);
-    coord2.y = R*sin(4*alfa);
+    coord2.x = R*cos(2*alfa);
+    coord2.y = R*sin(2*alfa);
     return coord2;
 }
 
