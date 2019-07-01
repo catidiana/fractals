@@ -159,8 +159,8 @@ V2 hyperbolic (V2 coord)
     else if (coord.y>0) alfa = M_PI/2;
     else if (coord.y<0) alfa = - M_PI/2;
     else alfa = 0;
-    coord2.x = sin(alfa)/R;
-    coord2.y = cos(alfa)*R;
+    coord2.x = sin(2*alfa)/R;
+    coord2.y = cos(2*alfa)*R;
     return coord2;
 }
 
