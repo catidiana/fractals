@@ -48,14 +48,9 @@ V2 spherical (V2 coord)
 V2 swirl (V2 coord)
 {
     V2 coord2;
-    r64 R = sqrt(coord.x*coord.x + coord.y*coord.y);
-    r64 alfa;
-    if (coord.x != 0) alfa = atan (coord.y/coord.x);
-    else if (coord.y>0) alfa = M_PI/2;
-    else if (coord.y<0) alfa = - M_PI/2;
-    else alfa = 0;
-    coord2.x = R*cos(2*alfa+R);
-    coord2.y = R*sin(2*alfa+R);
+    r64 R = coord.x*coord.x + coord.y*coord.y;
+    coord2.x = coord.x*sin(R) - coord.y*cos(R);
+    coord2.y = coord.x*cos(R) + coord.y*sin(R);
     return coord2;
 }
 
@@ -64,13 +59,8 @@ V2 horseshoe (V2 coord)
 {
     V2 coord2;
     r64 R = sqrt(coord.x*coord.x + coord.y*coord.y);
-    r64 alfa;
-    if (coord.x != 0) alfa = atan (coord.y/coord.x);
-    else if (coord.y>0) alfa = M_PI/2;
-    else if (coord.y<0) alfa = - M_PI/2;
-    else alfa = 0;
-    coord2.x = R*cos(2*alfa);
-    coord2.y = R*sin(2*alfa);
+    coord2.x = (coord.x - coord.y)*(coord.x + coord.y)/R;
+    coord2.y = 2*coord.x*coord.y/R;
     return coord2;
 }
 
