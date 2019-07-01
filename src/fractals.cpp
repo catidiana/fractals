@@ -159,6 +159,16 @@ new_image (u32 w, u32 h, int x, int y)
     return image;
 }
 
+static void
+reset_image (Image image)
+{
+    for (u32 i = 0; i< image.w*image.h; i++)
+    {
+        image.counter[i] = 0;
+        image.normal[i] = 0;
+    }
+}
+
 
 static void
 update_image_texture (Image image)
@@ -482,6 +492,7 @@ main (int argc, char **argv)
         case INPUT_GEN_AFFINE:
         {
             corr_flag = false;
+            reset_image (images[0]);
             uniform_fill (images[0], 0x000000);
             draw_image (images[2], "res/low.data", 760, 40, 0, 0);
             eqCount = rand()%10 + 1;
@@ -494,6 +505,7 @@ main (int argc, char **argv)
             if (eqCount < 30)
             {
                 corr_flag = false;
+                reset_image (images[0]);
                 uniform_fill (images[0], 0x000000);
                 draw_image (images[2], "res/low.data", 760, 40, 0, 0);
                 do {
@@ -523,6 +535,7 @@ main (int argc, char **argv)
         {
             if (eqCount > 1)  {
                 corr_flag = false;
+                reset_image (images[0]);
                 uniform_fill (images[0], 0x000000);
                 draw_image (images[2], "res/low.data", 760, 40, 0, 0);
                 eqCount = eqCount - 1;
@@ -533,6 +546,7 @@ main (int argc, char **argv)
         case INPUT_ZOOM_IN:
             {
                 corr_flag = false;
+                reset_image (images[0]);
                 uniform_fill (images[0], 0x000000);
                 fill_pool (start, trans, eqCount);
                 scale = scale/2;
@@ -540,6 +554,7 @@ main (int argc, char **argv)
             case INPUT_ZOOM_OUT:
             {
                 corr_flag = false;
+                reset_image (images[0]);
                 uniform_fill (images[0], 0x000000);
                 fill_pool (start, trans, eqCount);
                 scale = scale*2;
@@ -554,6 +569,7 @@ main (int argc, char **argv)
             case INPUT_SHIFT_DOWN:
             {
                 corr_flag = false;
+                reset_image (images[0]);
                 uniform_fill (images[0], 0x000000);
                 fill_pool (start, trans, eqCount);
                 y_shift = y_shift - 0.5;
@@ -561,6 +577,7 @@ main (int argc, char **argv)
             case INPUT_SHIFT_RIGHT:
             {
                 corr_flag = false;
+                reset_image (images[0]);
                 uniform_fill (images[0], 0x000000);
                 fill_pool (start, trans, eqCount);
                 x_shift = x_shift + 0.5;
@@ -568,6 +585,7 @@ main (int argc, char **argv)
             case INPUT_SHIFT_LEFT:
             {
                 corr_flag = false;
+                reset_image (images[0]);
                 uniform_fill (images[0], 0x000000);
                 fill_pool (start, trans, eqCount);
                 x_shift = x_shift - 0.5;
@@ -575,6 +593,7 @@ main (int argc, char **argv)
             case INPUT_RESET_SCALE:
             {
                 corr_flag = false;
+                reset_image (images[0]);
                 uniform_fill (images[0], 0x000000);
                 fill_pool (start, trans, eqCount);
                 x_shift = 0;
@@ -585,6 +604,7 @@ main (int argc, char **argv)
             {
                 corr_flag = false;
                 rand_flag = false;
+                reset_image (images[0]);
                 trans_flag = 0;
                 uniform_fill (images[0], 0x000000);
                 draw_image (images[2], "res/low.data", 760, 40, 0, 0);
@@ -600,6 +620,7 @@ main (int argc, char **argv)
             {
                 corr_flag = false;
                 rand_flag = false;
+                reset_image (images[0]);
                 trans_flag = 1;
                 uniform_fill (images[0], 0x000000);
                 draw_image (images[2], "res/low.data", 760, 40, 0, 0);
@@ -615,6 +636,7 @@ main (int argc, char **argv)
             {
                 corr_flag = false;
                 rand_flag = false;
+                reset_image (images[0]);
                 trans_flag = 2;
                 uniform_fill (images[0], 0x000000);
                 draw_image (images[2], "res/low.data", 760, 40, 0, 0);
@@ -630,6 +652,7 @@ main (int argc, char **argv)
             {
                 corr_flag = false;
                 rand_flag = false;
+                reset_image (images[0]);
                 trans_flag = 3;
                 uniform_fill (images[0], 0x000000);
                 draw_image (images[2], "res/low.data", 760, 40, 0, 0);
@@ -645,6 +668,7 @@ main (int argc, char **argv)
             {
                 corr_flag = false;
                 rand_flag = false;
+                reset_image (images[0]);
                 trans_flag = 4;
                 uniform_fill (images[0], 0x000000);
                 draw_image (images[2], "res/low.data", 760, 40, 0, 0);
@@ -660,6 +684,7 @@ main (int argc, char **argv)
             {
                 corr_flag = false;
                 rand_flag = false;
+                reset_image (images[0]);
                 trans_flag = 5;
                 uniform_fill (images[0], 0x000000);
                 draw_image (images[2], "res/low.data", 760, 40, 0, 0);
@@ -675,6 +700,7 @@ main (int argc, char **argv)
             {
                 corr_flag = false;
                 rand_flag = false;
+                reset_image (images[0]);
                 trans_flag = 6;
                 uniform_fill (images[0], 0x000000);
                 draw_image (images[2], "res/low.data", 760, 40, 0, 0);
@@ -690,6 +716,7 @@ main (int argc, char **argv)
             {
                 corr_flag = false;
                 rand_flag = false;
+                reset_image (images[0]);
                 trans_flag = 7;
                 uniform_fill (images[0], 0x000000);
                 draw_image (images[2], "res/low.data", 760, 40, 0, 0);
@@ -705,6 +732,7 @@ main (int argc, char **argv)
             {
                 corr_flag = false;
                 rand_flag = false;
+                reset_image (images[0]);
                 trans_flag = 8;
                 uniform_fill (images[0], 0x000000);
                 draw_image (images[2], "res/low.data", 760, 40, 0, 0);
@@ -720,6 +748,7 @@ main (int argc, char **argv)
             {
                 corr_flag = false;
                 rand_flag = false;
+                reset_image (images[0]);
                 trans_flag = 9;
                 uniform_fill (images[0], 0x000000);
                 draw_image (images[2], "res/low.data", 760, 40, 0, 0);
@@ -735,6 +764,7 @@ main (int argc, char **argv)
             {
                 corr_flag = false;
                 rand_flag = false;
+                reset_image (images[0]);
                 trans_flag = 10;
                 uniform_fill (images[0], 0x000000);
                 draw_image (images[2], "res/low.data", 760, 40, 0, 0);
@@ -750,6 +780,7 @@ main (int argc, char **argv)
             {
                 corr_flag = false;
                 rand_flag = false;
+                reset_image (images[0]);
                 trans_flag = 11;
                 uniform_fill (images[0], 0x000000);
                 draw_image (images[2], "res/low.data", 760, 40, 0, 0);
@@ -765,6 +796,7 @@ main (int argc, char **argv)
             {
                 corr_flag = false;
                 rand_flag = false;
+                reset_image (images[0]);
                 trans_flag = 12;
                 uniform_fill (images[0], 0x000000);
                 draw_image (images[2], "res/low.data", 760, 40, 0, 0);
@@ -780,6 +812,7 @@ main (int argc, char **argv)
             {
                 corr_flag = false;
                 rand_flag = false;
+                reset_image (images[0]);
                 trans_flag = 13;
                 uniform_fill (images[0], 0x000000);
                 draw_image (images[2], "res/low.data", 760, 40, 0, 0);
@@ -795,6 +828,7 @@ main (int argc, char **argv)
             {
                 corr_flag = false;
                 rand_flag = true;
+                reset_image (images[0]);
                 uniform_fill (images[0], 0x000000);
                 draw_image (images[2], "res/low.data", 760, 40, 0, 0);
                 eqCount = rand()%10 + 1;

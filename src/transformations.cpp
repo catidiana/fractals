@@ -204,7 +204,6 @@ V2 julia (V2 coord)
     else if (coord.y>0) alfa = M_PI/2;
     else if (coord.y<0) alfa = - M_PI/2;
     else alfa = 0;
-    srand(time(0));
     r64 tau = (rand()%2)*M_PI;
     coord2.x = sqrt(R)*cos(alfa/2 + tau);
     coord2.y = sqrt(R)*sin(alfa/2 + tau);
