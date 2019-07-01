@@ -16,6 +16,50 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+static void
+draw_pixel (Image image, r64 x, r64 y, V3 color)
+{
+    u32 x1 = floor(x);
+    u32 y1 = floor(y);
+    u32 x2 = ceil(x);
+    u32 y2 = ceil(y);
+
+    r64 c1 = (x-floor(x))*(y-floor(y));
+    V3 existing_color1 = image.pixels[y1 * image.w + x1];
+    V3 new_color1 = {};
+    new_color1.r = (1-c1)*existing_color1.r + c1*color.r;
+    new_color1.g = (1-c1)*existing_color1.g + c1*color.g;
+    new_color1.b = (1-c1)*existing_color1.b + c1*color.b;
+    image.pixels[y1 * image.w + x1] = new_color1;
+
+    r64 c2 = (floor(x))*(y-floor(y));
+    V3 existing_color2 = image.pixels[y1 * image.w + x2];
+    V3 new_color2 = {};
+    new_color2.r = (1-c2)*existing_color2.r + c2*color.r;
+    new_color2.g = (1-c2)*existing_color2.g + c2*color.g;
+    new_color2.b = (1-c2)*existing_color2.b + c2*color.b;
+    image.pixels[y1 * image.w + x2] = new_color2;
+
+    r64 c3 = (x - floor(x))*(floor(y));
+    V3 existing_color3 = image.pixels[y2 * image.w + x1];
+    V3 new_color3 = {};
+    new_color3.r = (1-c3)*existing_color3.r + c3*color.r;
+    new_color3.g = (1-c3)*existing_color3.g + c3*color.g;
+    new_color3.b = (1-c3)*existing_color3.b + c3*color.b;
+    image.pixels[y2 * image.w + x1] = new_color3;
+
+    r64 c4 = (floor(x))*(floor(y));
+    V3 existing_color4 = image.pixels[y2 * image.w + x2];
+    V3 new_color4 = {};
+    new_color4.r = (1-c4)*existing_color4.r + c4*color.r;
+    new_color4.g = (1-c4)*existing_color4.g + c4*color.g;
+    new_color4.b = (1-c4)*existing_color4.b + c4*color.b;
+    image.pixels[y2 * image.w + x2] = new_color4;
+
+
+
+
+}
 
 
 static void
