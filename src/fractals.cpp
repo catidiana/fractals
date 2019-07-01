@@ -71,6 +71,14 @@ enum InputType {
     INPUT_EX,
     INPUT_JULIA,
     INPUT_RANDOM,
+    INPUT_WAVES,
+    INPUT_POPCORN,
+    INPUT_EXPONENTIAL,
+    INPUT_POWER,
+    INPUT_RINGS,
+    INPUT_FAN,
+    INPUT_FISHEYE,
+    INPUT_BUBBLE,
 };
 
 
@@ -405,9 +413,10 @@ main (int argc, char **argv)
     r64 scale = 1;
     r64 x_shift = 0;
     r64 y_shift = 0;
-    u32 trans_flag = rand()%14;
+    u32 trans_flag = rand()%22;
     bool corr_flag = false;
     bool rand_flag = false;
+    u32 random_set[5] = {0, 0, 0, 0, 0};
 
 
 
@@ -459,8 +468,8 @@ main (int argc, char **argv)
                     case SDLK_l:            input = INPUT_LINEAR; break;
                     case SDLK_u:            input = INPUT_SINUSOIDAL; break;
                     case SDLK_p:            input = INPUT_SPHERICAL; break;
-                    case SDLK_h:            input = INPUT_SWIRL; break;
-                    case SDLK_o:            input = INPUT_HORSESHOE; break;
+                    case SDLK_o:            input = INPUT_SWIRL; break;
+                    case SDLK_h:            input = INPUT_HORSESHOE; break;
                     case SDLK_b:            input = INPUT_POLAR; break;
                     case SDLK_f:            input = INPUT_HANDKERCHIEF; break;
                     case SDLK_m:            input = INPUT_HEART; break;
@@ -471,6 +480,14 @@ main (int argc, char **argv)
                     case SDLK_e:            input = INPUT_EX; break;
                     case SDLK_j:            input = INPUT_JULIA; break;
                     case SDLK_r:            input = INPUT_RANDOM; break;
+                    case SDLK_1:            input = INPUT_WAVES; break;
+                    case SDLK_2:            input = INPUT_POPCORN; break;
+                    case SDLK_3:            input = INPUT_EXPONENTIAL; break;
+                    case SDLK_4:            input = INPUT_POWER; break;
+                    case SDLK_5:            input = INPUT_RINGS; break;
+                    case SDLK_6:            input = INPUT_FAN; break;
+                    case SDLK_7:            input = INPUT_FISHEYE; break;
+                    case SDLK_8:            input = INPUT_BUBBLE; break;
                     }
                 }
             } break;
@@ -542,327 +559,433 @@ main (int argc, char **argv)
                 draw_integer(images[2], eqCount);
                 fill_pool (start, trans, eqCount);
             }
-            } break;
+        } break;
         case INPUT_ZOOM_IN:
-            {
-                corr_flag = false;
-                reset_image (images[0]);
-                uniform_fill (images[0], 0x000000);
-                fill_pool (start, trans, eqCount);
-                scale = scale/2;
-            } break;
-            case INPUT_ZOOM_OUT:
-            {
-                corr_flag = false;
-                reset_image (images[0]);
-                uniform_fill (images[0], 0x000000);
-                fill_pool (start, trans, eqCount);
-                scale = scale*2;
-            } break;
-            case INPUT_SHIFT_UP:
-            {
-                corr_flag = false;
-                uniform_fill (images[0], 0x000000);
-                fill_pool (start, trans, eqCount);
-                y_shift = y_shift + 0.5;
-            } break;
-            case INPUT_SHIFT_DOWN:
-            {
-                corr_flag = false;
-                reset_image (images[0]);
-                uniform_fill (images[0], 0x000000);
-                fill_pool (start, trans, eqCount);
-                y_shift = y_shift - 0.5;
-            } break;
-            case INPUT_SHIFT_RIGHT:
-            {
-                corr_flag = false;
-                reset_image (images[0]);
-                uniform_fill (images[0], 0x000000);
-                fill_pool (start, trans, eqCount);
-                x_shift = x_shift + 0.5;
-            } break;
-            case INPUT_SHIFT_LEFT:
-            {
-                corr_flag = false;
-                reset_image (images[0]);
-                uniform_fill (images[0], 0x000000);
-                fill_pool (start, trans, eqCount);
-                x_shift = x_shift - 0.5;
-            } break;
-            case INPUT_RESET_SCALE:
-            {
-                corr_flag = false;
-                reset_image (images[0]);
-                uniform_fill (images[0], 0x000000);
-                fill_pool (start, trans, eqCount);
-                x_shift = 0;
-                y_shift = 0;
-                scale = 1.0;
-            } break;
-            case INPUT_LINEAR:
-            {
-                corr_flag = false;
-                rand_flag = false;
-                reset_image (images[0]);
-                trans_flag = 0;
-                uniform_fill (images[0], 0x000000);
-                fill_pool (start, trans, eqCount);
-                x_shift = 0;
-                y_shift = 0;
-                scale = 1.0;
-            } break;
-            case INPUT_SINUSOIDAL:
-            {
-                corr_flag = false;
-                rand_flag = false;
-                reset_image (images[0]);
-                trans_flag = 1;
-                uniform_fill (images[0], 0x000000);
-                fill_pool (start, trans, eqCount);
-                x_shift = 0;
-                y_shift = 0;
-                scale = 1.0;
-            } break;
-            case INPUT_SPHERICAL:
-            {
-                corr_flag = false;
-                rand_flag = false;
-                reset_image (images[0]);
-                trans_flag = 2;
-                uniform_fill (images[0], 0x000000);
-                fill_pool (start, trans, eqCount);
-                x_shift = 0;
-                y_shift = 0;
-                scale = 1.0;
-            } break;
-            case INPUT_SWIRL:
-            {
-                corr_flag = false;
-                rand_flag = false;
-                reset_image (images[0]);
-                trans_flag = 3;
-                uniform_fill (images[0], 0x000000);
-                fill_pool (start, trans, eqCount);
-                x_shift = 0;
-                y_shift = 0;
-                scale = 1.0;
-            } break;
-            case INPUT_HORSESHOE:
-            {
-                corr_flag = false;
-                rand_flag = false;
-                reset_image (images[0]);
-                trans_flag = 4;
-                uniform_fill (images[0], 0x000000);
-                fill_pool (start, trans, eqCount);
-                x_shift = 0;
-                y_shift = 0;
-                scale = 1.0;
-            } break;
-            case INPUT_POLAR:
-            {
-                corr_flag = false;
-                rand_flag = false;
-                reset_image (images[0]);
-                trans_flag = 5;
-                uniform_fill (images[0], 0x000000);
-                fill_pool (start, trans, eqCount);
-                x_shift = 0;
-                y_shift = 0;
-                scale = 1.0;
-            } break;
-            case INPUT_HANDKERCHIEF:
-            {
-                corr_flag = false;
-                rand_flag = false;
-                reset_image (images[0]);
-                trans_flag = 6;
-                uniform_fill (images[0], 0x000000);
-                fill_pool (start, trans, eqCount);
-                x_shift = 0;
-                y_shift = 0;
-                scale = 1.0;
-            } break;
-            case INPUT_HEART:
-            {
-                corr_flag = false;
-                rand_flag = false;
-                reset_image (images[0]);
-                trans_flag = 7;
-                uniform_fill (images[0], 0x000000);
-                fill_pool (start, trans, eqCount);
-                x_shift = 0;
-                y_shift = 0;
-                scale = 1.0;
-            } break;
-            case INPUT_DISC:
-            {
-                corr_flag = false;
-                rand_flag = false;
-                reset_image (images[0]);
-                trans_flag = 8;
-                uniform_fill (images[0], 0x000000);
-                fill_pool (start, trans, eqCount);
-                x_shift = 0;
-                y_shift = 0;
-                scale = 1.0;
-            } break;
-            case INPUT_SPIRAL:
-            {
-                corr_flag = false;
-                rand_flag = false;
-                reset_image (images[0]);
-                trans_flag = 9;
-                uniform_fill (images[0], 0x000000);
-                fill_pool (start, trans, eqCount);
-                x_shift = 0;
-                y_shift = 0;
-                scale = 1.0;
-            } break;
-            case INPUT_HYPERBOLIC:
-            {
-                corr_flag = false;
-                rand_flag = false;
-                reset_image (images[0]);
-                trans_flag = 10;
-                uniform_fill (images[0], 0x000000);
-                fill_pool (start, trans, eqCount);
-                x_shift = 0;
-                y_shift = 0;
-                scale = 1.0;
-            } break;
-            case INPUT_DIAMOND:
-            {
-                corr_flag = false;
-                rand_flag = false;
-                reset_image (images[0]);
-                trans_flag = 11;
-                uniform_fill (images[0], 0x000000);
-                fill_pool (start, trans, eqCount);
-                x_shift = 0;
-                y_shift = 0;
-                scale = 1.0;
-            } break;
-            case INPUT_EX:
-            {
-                corr_flag = false;
-                rand_flag = false;
-                reset_image (images[0]);
-                trans_flag = 12;
-                uniform_fill (images[0], 0x000000);
-                fill_pool (start, trans, eqCount);
-                x_shift = 0;
-                y_shift = 0;
-                scale = 1.0;
-            } break;
-            case INPUT_JULIA:
-            {
-                corr_flag = false;
-                rand_flag = false;
-                reset_image (images[0]);
-                trans_flag = 13;
-                uniform_fill (images[0], 0x000000);
-                fill_pool (start, trans, eqCount);
-                x_shift = 0;
-                y_shift = 0;
-                scale = 1.0;
-            } break;
-            case INPUT_RANDOM:
-            {
-                corr_flag = false;
-                rand_flag = true;
-                reset_image (images[0]);
-                uniform_fill (images[0], 0x000000);
-                fill_pool (start, trans, eqCount);
-                x_shift = 0;
-                y_shift = 0;
-                scale = 1.0;
-            } break;
-
+        {
+            corr_flag = false;
+            reset_image (images[0]);
+            uniform_fill (images[0], 0x000000);
+            fill_pool (start, trans, eqCount);
+            scale = scale/2;
+        } break;
+        case INPUT_ZOOM_OUT:
+        {
+            corr_flag = false;
+            reset_image (images[0]);
+            uniform_fill (images[0], 0x000000);
+            fill_pool (start, trans, eqCount);
+            scale = scale*2;
+        } break;
+        case INPUT_SHIFT_UP:
+        {
+            corr_flag = false;
+            uniform_fill (images[0], 0x000000);
+            fill_pool (start, trans, eqCount);
+            y_shift = y_shift + 0.5;
+        } break;
+        case INPUT_SHIFT_DOWN:
+        {
+            corr_flag = false;
+            reset_image (images[0]);
+            uniform_fill (images[0], 0x000000);
+            fill_pool (start, trans, eqCount);
+            y_shift = y_shift - 0.5;
+        } break;
+        case INPUT_SHIFT_RIGHT:
+        {
+            corr_flag = false;
+            reset_image (images[0]);
+            uniform_fill (images[0], 0x000000);
+            fill_pool (start, trans, eqCount);
+            x_shift = x_shift + 0.5;
+        } break;
+        case INPUT_SHIFT_LEFT:
+        {
+            corr_flag = false;
+            reset_image (images[0]);
+            uniform_fill (images[0], 0x000000);
+            fill_pool (start, trans, eqCount);
+            x_shift = x_shift - 0.5;
+        } break;
+        case INPUT_RESET_SCALE:
+        {
+            corr_flag = false;
+            reset_image (images[0]);
+            uniform_fill (images[0], 0x000000);
+            fill_pool (start, trans, eqCount);
+            x_shift = 0;
+            y_shift = 0;
+            scale = 1.0;
+        } break;
+        case INPUT_LINEAR:
+        {
+            corr_flag = false;
+            rand_flag = false;
+            reset_image (images[0]);
+            trans_flag = 0;
+            uniform_fill (images[0], 0x000000);
+            fill_pool (start, trans, eqCount);
+            x_shift = 0;
+            y_shift = 0;
+            scale = 1.0;
+        } break;
+        case INPUT_SINUSOIDAL:
+        {
+            corr_flag = false;
+            rand_flag = false;
+            reset_image (images[0]);
+            trans_flag = 1;
+            uniform_fill (images[0], 0x000000);
+            fill_pool (start, trans, eqCount);
+            x_shift = 0;
+            y_shift = 0;
+            scale = 1.0;
+        } break;
+        case INPUT_SPHERICAL:
+        {
+            corr_flag = false;
+            rand_flag = false;
+            reset_image (images[0]);
+            trans_flag = 2;
+            uniform_fill (images[0], 0x000000);
+            fill_pool (start, trans, eqCount);
+            x_shift = 0;
+            y_shift = 0;
+            scale = 1.0;
+        } break;
+        case INPUT_SWIRL:
+        {
+            corr_flag = false;
+            rand_flag = false;
+            reset_image (images[0]);
+            trans_flag = 3;
+            uniform_fill (images[0], 0x000000);
+            fill_pool (start, trans, eqCount);
+            x_shift = 0;
+            y_shift = 0;
+            scale = 1.0;
+        } break;
+        case INPUT_HORSESHOE:
+        {
+            corr_flag = false;
+            rand_flag = false;
+            reset_image (images[0]);
+            trans_flag = 4;
+            uniform_fill (images[0], 0x000000);
+            fill_pool (start, trans, eqCount);
+            x_shift = 0;
+            y_shift = 0;
+            scale = 1.0;
+        } break;
+        case INPUT_POLAR:
+        {
+            corr_flag = false;
+            rand_flag = false;
+            reset_image (images[0]);
+            trans_flag = 5;
+            uniform_fill (images[0], 0x000000);
+            fill_pool (start, trans, eqCount);
+            x_shift = 0;
+            y_shift = 0;
+            scale = 1.0;
+        } break;
+        case INPUT_HANDKERCHIEF:
+        {
+            corr_flag = false;
+            rand_flag = false;
+            reset_image (images[0]);
+            trans_flag = 6;
+            uniform_fill (images[0], 0x000000);
+            fill_pool (start, trans, eqCount);
+            x_shift = 0;
+            y_shift = 0;
+            scale = 1.0;
+        } break;
+        case INPUT_HEART:
+        {
+            corr_flag = false;
+            rand_flag = false;
+            reset_image (images[0]);
+            trans_flag = 7;
+            uniform_fill (images[0], 0x000000);
+            fill_pool (start, trans, eqCount);
+            x_shift = 0;
+            y_shift = 0;
+            scale = 1.0;
+        } break;
+        case INPUT_DISC:
+        {
+            corr_flag = false;
+            rand_flag = false;
+            reset_image (images[0]);
+            trans_flag = 8;
+            uniform_fill (images[0], 0x000000);
+            fill_pool (start, trans, eqCount);
+            x_shift = 0;
+            y_shift = 0;
+            scale = 1.0;
+        } break;
+        case INPUT_SPIRAL:
+        {
+            corr_flag = false;
+            rand_flag = false;
+            reset_image (images[0]);
+            trans_flag = 9;
+            uniform_fill (images[0], 0x000000);
+            fill_pool (start, trans, eqCount);
+            x_shift = 0;
+            y_shift = 0;
+            scale = 1.0;
+        } break;
+        case INPUT_HYPERBOLIC:
+        {
+            corr_flag = false;
+            rand_flag = false;
+            reset_image (images[0]);
+            trans_flag = 10;
+            uniform_fill (images[0], 0x000000);
+            fill_pool (start, trans, eqCount);
+            x_shift = 0;
+            y_shift = 0;
+            scale = 1.0;
+        } break;
+        case INPUT_DIAMOND:
+        {
+            corr_flag = false;
+            rand_flag = false;
+            reset_image (images[0]);
+            trans_flag = 11;
+            uniform_fill (images[0], 0x000000);
+            fill_pool (start, trans, eqCount);
+            x_shift = 0;
+            y_shift = 0;
+            scale = 1.0;
+        } break;
+        case INPUT_EX:
+        {
+            corr_flag = false;
+            rand_flag = false;
+            reset_image (images[0]);
+            trans_flag = 12;
+            uniform_fill (images[0], 0x000000);
+            fill_pool (start, trans, eqCount);
+            x_shift = 0;
+            y_shift = 0;
+            scale = 1.0;
+        } break;
+        case INPUT_JULIA:
+        {
+            corr_flag = false;
+            rand_flag = false;
+            reset_image (images[0]);
+            trans_flag = 13;
+            uniform_fill (images[0], 0x000000);
+            fill_pool (start, trans, eqCount);
+            x_shift = 0;
+            y_shift = 0;
+            scale = 1.0;
+        } break;
+        case INPUT_RANDOM:
+        {
+            corr_flag = false;
+            rand_flag = true;
+            for (int j = 0;j < 5;j++) {
+                random_set[j] = rand()%22;
             }
-
-
-
-            glClear (GL_COLOR_BUFFER_BIT);
-
-
-            //uniform_fill (images[0], 0x000000);
-            if (corr_flag == false)
-            {
-                for(u32 num=0; num<pool; num++)
-                {
-                    u32 i=rand()%eqCount;
-                    r64 x1=trans[i].a*start[num].x+trans[i].b1*start[num].y+trans[i].c;
-                    r64 y1=trans[i].d*start[num].x+trans[i].e*start[num].y+trans[i].f;
-                    start[num].x = x1;
-                    start[num].y = y1;
-                    if (rand_flag == true) trans_flag = rand()%14;
-                    switch (trans_flag) {
-                    case 0: start[num] = linear(start[num]); break;
-                    case 1: start[num] = sinusoidal(start[num]); break;
-                    case 2: start[num] = spherical(start[num]); break;
-                    case 3: start[num] = swirl(start[num]); break;
-                    case 4: start[num] = horseshoe(start[num]); break;
-                    case 5: start[num] = polar(start[num]); break;
-                    case 6: start[num] = handkerchief(start[num]); break;
-                    case 7: start[num] = heart(start[num]); break;
-                    case 8: start[num] = disc(start[num]); break;
-                    case 9: start[num] = spiral(start[num]); break;
-                    case 10: start[num] = hyperbolic(start[num]); break;
-                    case 11: start[num] = diamond(start[num]); break;
-                    case 12: start[num] = ex(start[num]); break;
-                    case 13: start[num] = julia(start[num]); break;
-
-                    }
-                    r64 x_coord = (start[num].x+(2.0+x_shift)*scale)*(190/scale);
-                    r64 y_coord = (start[num].y+(2.0+y_shift)*scale)*(190/scale);
-                    u32 x_c = floor(x_coord);
-                    u32 y_c = floor (y_coord);
-                    if(x_c < images[0].w && y_c < images[0].h)
-                    {
-                        if(images[0].counter[y_c*images[0].w + x_c]==0)
-                        {
-                            V3 to_color;
-                            to_color.r = trans[i].r;
-                            to_color.g = trans[i].g;
-                            to_color.b = trans[i].b;
-                            images[0].pixels[y_c*images[0].w + x_c] = to_color;
-
-                        } else
-                        {
-                            V3 to_color;
-                            V3 current = images[0].pixels[y_c*images[0].w + x_c];
-                            to_color.r = (trans[i].r + current.r)/2;
-                            to_color.g = (trans[i].g + current.g)/2;
-                            to_color.b = (trans[i].b + current.b)/2;
-                            images[0].pixels[y_c*images[0].w + x_c] = to_color;
-
-                        }
-                        images[0].counter[y_c*images[0].w + x_c]++;
-                    }
-                }
-            }
-
-
-
-            ++s;
-
-
-            for (u32 i = 0; i < images_count; ++i)
-            {
-                update_image_texture (images[i]);
-                show_image           (images[i]);
-            }
-
-            //SDL_Delay(10000);
-
-
-            SDL_GL_SwapWindow (main_window);
+            reset_image (images[0]);
+            uniform_fill (images[0], 0x000000);
+            fill_pool (start, trans, eqCount);
+            x_shift = 0;
+            y_shift = 0;
+            scale = 1.0;
+        } break;
+        case INPUT_WAVES:
+        {
+            corr_flag = false;
+            rand_flag = false;
+            reset_image (images[0]);
+            trans_flag = 14;
+            uniform_fill (images[0], 0x000000);
+            fill_pool (start, trans, eqCount);
+            x_shift = 0;
+            y_shift = 0;
+            scale = 1.0;
+        } break;
+        case INPUT_POPCORN:
+        {
+            corr_flag = false;
+            rand_flag = false;
+            reset_image (images[0]);
+            trans_flag = 15;
+            uniform_fill (images[0], 0x000000);
+            fill_pool (start, trans, eqCount);
+            x_shift = 0;
+            y_shift = 0;
+            scale = 1.0;
+        } break;
+        case INPUT_EXPONENTIAL:
+        {
+            corr_flag = false;
+            rand_flag = false;
+            reset_image (images[0]);
+            trans_flag = 16;
+            uniform_fill (images[0], 0x000000);
+            fill_pool (start, trans, eqCount);
+            x_shift = 0;
+            y_shift = 0;
+            scale = 1.0;
+        } break;
+        case INPUT_POWER:
+        {
+            corr_flag = false;
+            rand_flag = false;
+            reset_image (images[0]);
+            trans_flag = 17;
+            uniform_fill (images[0], 0x000000);
+            fill_pool (start, trans, eqCount);
+            x_shift = 0;
+            y_shift = 0;
+            scale = 1.0;
+        } break;
+        case INPUT_RINGS:
+        {
+            corr_flag = false;
+            rand_flag = false;
+            reset_image (images[0]);
+            trans_flag = 18;
+            uniform_fill (images[0], 0x000000);
+            fill_pool (start, trans, eqCount);
+            x_shift = 0;
+            y_shift = 0;
+            scale = 1.0;
+        } break;
+        case INPUT_FAN:
+        {
+            corr_flag = false;
+            rand_flag = false;
+            reset_image (images[0]);
+            trans_flag = 19;
+            uniform_fill (images[0], 0x000000);
+            fill_pool (start, trans, eqCount);
+            x_shift = 0;
+            y_shift = 0;
+            scale = 1.0;
+        } break;
+        case INPUT_FISHEYE:
+        {
+            corr_flag = false;
+            rand_flag = false;
+            reset_image (images[0]);
+            trans_flag = 20;
+            uniform_fill (images[0], 0x000000);
+            fill_pool (start, trans, eqCount);
+            x_shift = 0;
+            y_shift = 0;
+            scale = 1.0;
+        } break;
+        case INPUT_BUBBLE:
+        {
+            corr_flag = false;
+            rand_flag = false;
+            reset_image (images[0]);
+            trans_flag = 21;
+            uniform_fill (images[0], 0x000000);
+            fill_pool (start, trans, eqCount);
+            x_shift = 0;
+            y_shift = 0;
+            scale = 1.0;
+        } break;
         }
 
-        return 0;
+
+
+        glClear (GL_COLOR_BUFFER_BIT);
+
+
+        //uniform_fill (images[0], 0x000000);
+        if (corr_flag == false)
+        {
+            for(u32 num=0; num<pool; num++)
+            {
+                u32 i=rand()%eqCount;
+                r64 x1=trans[i].a*start[num].x+trans[i].b1*start[num].y+trans[i].c;
+                r64 y1=trans[i].d*start[num].x+trans[i].e*start[num].y+trans[i].f;
+                start[num].x = x1;
+                start[num].y = y1;
+                if (rand_flag == true) trans_flag = random_set[rand()%5];
+                switch (trans_flag) {
+                case 0: start[num] = linear(start[num]); break;
+                case 1: start[num] = sinusoidal(start[num]); break;
+                case 2: start[num] = spherical(start[num]); break;
+                case 3: start[num] = swirl(start[num]); break;
+                case 4: start[num] = horseshoe(start[num]); break;
+                case 5: start[num] = polar(start[num]); break;
+                case 6: start[num] = handkerchief(start[num]); break;
+                case 7: start[num] = heart(start[num]); break;
+                case 8: start[num] = disc(start[num]); break;
+                case 9: start[num] = spiral(start[num]); break;
+                case 10: start[num] = hyperbolic(start[num]); break;
+                case 11: start[num] = diamond(start[num]); break;
+                case 12: start[num] = ex(start[num]); break;
+                case 13: start[num] = julia(start[num]); break;
+                case 14: start[num] = waves(start[num], trans, i); break;
+                case 15: start[num] = popcorn(start[num], trans, i); break;
+                case 16: start[num] = exponential(start[num]); break;
+                case 17: start[num] = power(start[num]); break;
+                case 18: start[num] = rings(start[num], trans, i); break;
+                case 19: start[num] = fan(start[num], trans, i); break;
+                case 20: start[num] = fisheye(start[num]); break;
+                case 21: start[num] = bubble(start[num]); break;
+
+                }
+                r64 x_coord = (start[num].x+(2.0+x_shift)*scale)*(190/scale);
+                r64 y_coord = (start[num].y+(2.0+y_shift)*scale)*(190/scale);
+                u32 x_c = floor(x_coord);
+                u32 y_c = floor (y_coord);
+                if(x_c < images[0].w && y_c < images[0].h)
+                {
+                    if(images[0].counter[y_c*images[0].w + x_c]==0)
+                    {
+                        V3 to_color;
+                        to_color.r = trans[i].r;
+                        to_color.g = trans[i].g;
+                        to_color.b = trans[i].b;
+                        images[0].pixels[y_c*images[0].w + x_c] = to_color;
+
+                    } else
+                    {
+                        V3 to_color;
+                        V3 current = images[0].pixels[y_c*images[0].w + x_c];
+                        to_color.r = (trans[i].r + current.r)/2;
+                        to_color.g = (trans[i].g + current.g)/2;
+                        to_color.b = (trans[i].b + current.b)/2;
+                        images[0].pixels[y_c*images[0].w + x_c] = to_color;
+
+                    }
+                    images[0].counter[y_c*images[0].w + x_c]++;
+                }
+            }
+        }
+
+
+
+        ++s;
+
+
+        for (u32 i = 0; i < images_count; ++i)
+        {
+            update_image_texture (images[i]);
+            show_image           (images[i]);
+        }
+
+        //SDL_Delay(10000);
+
+
+        SDL_GL_SwapWindow (main_window);
     }
 
+    return 0;
+}
 
-    //  LocalWords:  InputType
+
+//  LocalWords:  InputType
