@@ -174,8 +174,8 @@ V2 diamond (V2 coord)
     else if (coord.y>0) alfa = M_PI/2;
     else if (coord.y<0) alfa = - M_PI/2;
     else alfa = 0;
-    coord2.x = sin(alfa)*cos(R);
-    coord2.y = cos(alfa)*sin(R);
+    coord2.x = sin(2*alfa)*cos(R);
+    coord2.y = cos(2*alfa)*sin(R);
     return coord2;
 }
 
