@@ -144,8 +144,8 @@ V2 spiral (V2 coord)
     else if (coord.y>0) alfa = M_PI/2;
     else if (coord.y<0) alfa = - M_PI/2;
     else alfa = 0;
-    coord2.x = (cos(alfa) + sin(R))/R;
-    coord2.y = (sin(alfa) - cos(R))/R;
+    coord2.x = (cos(2*alfa) + sin(R))/R;
+    coord2.y = (sin(2*alfa) - cos(R))/R;
     return coord2;
 }
 
