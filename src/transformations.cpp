@@ -54,8 +54,8 @@ V2 swirl (V2 coord)
     else if (coord.y>0) alfa = M_PI/2;
     else if (coord.y<0) alfa = - M_PI/2;
     else alfa = 0;
-    coord2.x = R*cos(alfa+R);
-    coord2.y = R*sin(alfa+R);
+    coord2.x = R*cos(2*alfa+R);
+    coord2.y = R*sin(2*alfa+R);
     return coord2;
 }
 
@@ -69,8 +69,8 @@ V2 horseshoe (V2 coord)
     else if (coord.y>0) alfa = M_PI/2;
     else if (coord.y<0) alfa = - M_PI/2;
     else alfa = 0;
-    coord2.x = R*cos(2*alfa);
-    coord2.y = R*sin(2*alfa);
+    coord2.x = R*cos(4*alfa);
+    coord2.y = R*sin(4*alfa);
     return coord2;
 }
 
@@ -84,7 +84,7 @@ V2 polar (V2 coord)
     else if (coord.y<0) alfa = - M_PI/2;
     else alfa = 0;
     r64 R = sqrt(coord.x*coord.x + coord.y*coord.y);
-    coord2.x = alfa/M_PI;
+    coord2.x = 2*alfa/M_PI;
     coord2.y = R - 1;
     return coord2;
 }
@@ -99,8 +99,8 @@ V2 handkerchief (V2 coord)
     else if (coord.y>0) alfa = M_PI/2;
     else if (coord.y<0) alfa = - M_PI/2;
     else alfa = 0;
-    coord2.x = R*sin(alfa+R);
-    coord2.y = R*cos(alfa-R);
+    coord2.x = R*sin(2*alfa+R);
+    coord2.y = R*cos(2*alfa-R);
     return coord2;
 }
 
@@ -114,8 +114,8 @@ V2 heart (V2 coord)
     else if (coord.y>0) alfa = M_PI/2;
     else if (coord.y<0) alfa = - M_PI/2;
     else alfa = 0;
-    coord2.x = R*sin(R*alfa);
-    coord2.y = - R*cos(R*alfa);
+    coord2.x = R*sin(2*R*alfa);
+    coord2.y = - R*cos(2*R*alfa);
     return coord2;
 }
 
@@ -129,8 +129,8 @@ V2 disc (V2 coord)
     else if (coord.y>0) alfa = M_PI/2;
     else if (coord.y<0) alfa = - M_PI/2;
     else alfa = 0;
-    coord2.x = (alfa/M_PI)*sin(R*M_PI);
-    coord2.y = (alfa/M_PI)*cos(R*M_PI);
+    coord2.x = (2*alfa/M_PI)*sin(R*M_PI);
+    coord2.y = (2*alfa/M_PI)*cos(R*M_PI);
     return coord2;
 }
 
@@ -188,8 +188,8 @@ V2 ex (V2 coord)
     else if (coord.y>0) alfa = M_PI/2;
     else if (coord.y<0) alfa = - M_PI/2;
     else alfa = 0;
-    coord2.x = R*pow(sin(alfa+R), 3);
-    coord2.y = R*pow(cos(alfa-R), 3);
+    coord2.x = R*pow(sin(2*alfa+R), 3);
+    coord2.y = R*pow(cos(2*alfa-R), 3);
     return coord2;
 }
 
