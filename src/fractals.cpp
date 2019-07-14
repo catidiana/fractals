@@ -360,10 +360,9 @@ fill_pool (V2 *start, affine *trans, u32 eqCount)
 }
 
 static void
-reset_before_transform (Image image, bool& corr_flag, bool& rand_flag, r64& x_shift, r64& y_shift, r64& scale, V2 *start, affine *trans, u32 eqCount)
+reset_before_transform (Image image, bool& corr_flag, r64& x_shift, r64& y_shift, r64& scale, V2 *start, affine *trans, u32 eqCount)
 {
     corr_flag = false;
-    rand_flag = false;
     reset_image (image);
     uniform_fill (image, 0x000000);
     fill_pool (start, trans, eqCount);
@@ -420,16 +419,15 @@ main (int argc, char **argv)
     V2 *start = (V2*)malloc(pool*sizeof (V2));
     fill_pool (start, trans, eqCount);
 
-
     r64 scale = 1;
     r64 x_shift = 0;
     r64 y_shift = 0;
     u32 trans_flag = rand()%22;
     bool corr_flag = false;
-    bool rand_flag = false;
-    u32 random_set[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-
+    u32 transform1 = 0;
+    u32 transform2 = 1;
+    r64 prob = 0.5;
 
     for (int keep_running = 1; keep_running; )
     {
@@ -631,124 +629,120 @@ main (int argc, char **argv)
         case INPUT_LINEAR:
         {
             trans_flag = 0;
-            reset_before_transform (images[0], corr_flag, rand_flag, x_shift, y_shift, scale, start, trans, eqCount);
+            reset_before_transform (images[0], corr_flag, x_shift, y_shift, scale, start, trans, eqCount);
         } break;
         case INPUT_SINUSOIDAL:
         {
             trans_flag = 1;
-            reset_before_transform (images[0], corr_flag, rand_flag, x_shift, y_shift, scale, start, trans, eqCount);
+            reset_before_transform (images[0], corr_flag, x_shift, y_shift, scale, start, trans, eqCount);
         } break;
         case INPUT_SPHERICAL:
         {
             trans_flag = 2;
-            reset_before_transform (images[0], corr_flag, rand_flag, x_shift, y_shift, scale, start, trans, eqCount);
+            reset_before_transform (images[0], corr_flag, x_shift, y_shift, scale, start, trans, eqCount);
         } break;
         case INPUT_SWIRL:
         {
             trans_flag = 3;
-            reset_before_transform (images[0], corr_flag, rand_flag, x_shift, y_shift, scale, start, trans, eqCount);
+            reset_before_transform (images[0], corr_flag, x_shift, y_shift, scale, start, trans, eqCount);
         } break;
         case INPUT_HORSESHOE:
         {
             trans_flag = 4;
-            reset_before_transform (images[0], corr_flag, rand_flag, x_shift, y_shift, scale, start, trans, eqCount);
+            reset_before_transform (images[0], corr_flag, x_shift, y_shift, scale, start, trans, eqCount);
         } break;
         case INPUT_POLAR:
         {
             trans_flag = 5;
-            reset_before_transform (images[0], corr_flag, rand_flag, x_shift, y_shift, scale, start, trans, eqCount);
+            reset_before_transform (images[0], corr_flag, x_shift, y_shift, scale, start, trans, eqCount);
         } break;
         case INPUT_HANDKERCHIEF:
         {
             trans_flag = 6;
-            reset_before_transform (images[0], corr_flag, rand_flag, x_shift, y_shift, scale, start, trans, eqCount);
+            reset_before_transform (images[0], corr_flag, x_shift, y_shift, scale, start, trans, eqCount);
         } break;
         case INPUT_HEART:
         {
             trans_flag = 7;
-            reset_before_transform (images[0], corr_flag, rand_flag, x_shift, y_shift, scale, start, trans, eqCount);
+            reset_before_transform (images[0], corr_flag, x_shift, y_shift, scale, start, trans, eqCount);
         } break;
         case INPUT_DISC:
         {
             trans_flag = 8;
-            reset_before_transform (images[0], corr_flag, rand_flag, x_shift, y_shift, scale, start, trans, eqCount);
+            reset_before_transform (images[0], corr_flag, x_shift, y_shift, scale, start, trans, eqCount);
         } break;
         case INPUT_SPIRAL:
         {
             trans_flag = 9;
-            reset_before_transform (images[0], corr_flag, rand_flag, x_shift, y_shift, scale, start, trans, eqCount);
+            reset_before_transform (images[0], corr_flag, x_shift, y_shift, scale, start, trans, eqCount);
         } break;
         case INPUT_HYPERBOLIC:
         {
             trans_flag = 10;
-            reset_before_transform (images[0], corr_flag, rand_flag, x_shift, y_shift, scale, start, trans, eqCount);
+            reset_before_transform (images[0], corr_flag, x_shift, y_shift, scale, start, trans, eqCount);
         } break;
         case INPUT_DIAMOND:
         {
             trans_flag = 11;
-            reset_before_transform (images[0], corr_flag, rand_flag, x_shift, y_shift, scale, start, trans, eqCount);
+            reset_before_transform (images[0], corr_flag, x_shift, y_shift, scale, start, trans, eqCount);
         } break;
         case INPUT_EX:
         {
             trans_flag = 12;
-            reset_before_transform (images[0], corr_flag, rand_flag, x_shift, y_shift, scale, start, trans, eqCount);
+            reset_before_transform (images[0], corr_flag, x_shift, y_shift, scale, start, trans, eqCount);
         } break;
         case INPUT_JULIA:
         {
             trans_flag = 13;
-            reset_before_transform (images[0], corr_flag, rand_flag, x_shift, y_shift, scale, start, trans, eqCount);
+            reset_before_transform (images[0], corr_flag, x_shift, y_shift, scale, start, trans, eqCount);
         } break;
         case INPUT_RANDOM:
         {
-            reset_before_transform (images[0], corr_flag, rand_flag, x_shift, y_shift, scale, start, trans, eqCount);
-            rand_flag = true;
-            int transform1 = rand()%22;
-            int transform2 = rand()%22;
-            for (int j = 0;j < 5;j++) {
-                random_set[j] = rand()%2;
-                if (random_set[j] == 0) random_set[j] = transform1;
-                else random_set[j] = transform2;
-            }
-        } break;
+            reset_before_transform (images[0], corr_flag, x_shift, y_shift, scale, start, trans, eqCount);
+            transform1 = rand()%22;
+            transform2 = rand()%22;
+            prob = (rand()%81)/100.0 + 0.1;
+            trans_flag = 22;
+            } break;
         case INPUT_WAVES:
         {
             trans_flag = 14;
-            reset_before_transform (images[0], corr_flag, rand_flag, x_shift, y_shift, scale, start, trans, eqCount);
+            reset_before_transform (images[0], corr_flag, x_shift, y_shift, scale, start, trans, eqCount);
         } break;
         case INPUT_POPCORN:
         {
             trans_flag = 15;
-            reset_before_transform (images[0], corr_flag, rand_flag, x_shift, y_shift, scale, start, trans, eqCount);
+            reset_before_transform (images[0], corr_flag, x_shift, y_shift, scale, start, trans, eqCount);
         } break;
         case INPUT_EXPONENTIAL:
         {
             trans_flag = 16;
-            reset_before_transform (images[0], corr_flag, rand_flag, x_shift, y_shift, scale, start, trans, eqCount);
+            reset_before_transform (images[0], corr_flag, x_shift, y_shift, scale, start, trans, eqCount);
         } break;
         case INPUT_POWER:
         {
             trans_flag = 17;
-            reset_before_transform (images[0], corr_flag, rand_flag, x_shift, y_shift, scale, start, trans, eqCount);
+            reset_before_transform (images[0], corr_flag, x_shift, y_shift, scale, start, trans, eqCount);
         } break;
         case INPUT_RINGS:
         {
             trans_flag = 18;
-            reset_before_transform (images[0], corr_flag, rand_flag, x_shift, y_shift, scale, start, trans, eqCount);
+            reset_before_transform (images[0], corr_flag, x_shift, y_shift, scale, start, trans, eqCount);
         } break;
         case INPUT_FAN:
         {
             trans_flag = 19;
-            reset_before_transform (images[0], corr_flag, rand_flag, x_shift, y_shift, scale, start, trans, eqCount);
+            reset_before_transform (images[0], corr_flag, x_shift, y_shift, scale, start, trans, eqCount);
         } break;
         case INPUT_FISHEYE:
         {
             trans_flag = 20;
-            reset_before_transform (images[0], corr_flag, rand_flag, x_shift, y_shift, scale, start, trans, eqCount);
+            reset_before_transform (images[0], corr_flag, x_shift, y_shift, scale, start, trans, eqCount);
         } break;
         case INPUT_BUBBLE:
         {
             trans_flag = 21;
-            reset_before_transform (images[0], corr_flag, rand_flag, x_shift, y_shift, scale, start, trans, eqCount);
+            reset_before_transform (images[0], corr_flag, x_shift, y_shift, scale, start, trans, eqCount);
         } break;
         }
 
@@ -767,7 +761,6 @@ main (int argc, char **argv)
                 r64 y1=trans[i].d*start[num].x+trans[i].e*start[num].y+trans[i].f;
                 start[num].x = x1;
                 start[num].y = y1;
-                if (rand_flag == true) trans_flag = random_set[rand()%10];
                 switch (trans_flag) {
                 case 0: start[num] = linear(start[num]); break;
                 case 1: start[num] = sinusoidal(start[num]); break;
@@ -791,7 +784,7 @@ main (int argc, char **argv)
                 case 19: start[num] = fan(start[num], trans, i); break;
                 case 20: start[num] = fisheye(start[num]); break;
                 case 21: start[num] = bubble(start[num]); break;
-
+                case 22: start[num] = random(start[num], transform1, transform2, prob, trans, i); break;
                 }
                 r64 x_coord = (start[num].x+(2.0+x_shift)*scale)*(190/scale);
                 r64 y_coord = (start[num].y+(2.0+y_shift)*scale)*(190/scale);

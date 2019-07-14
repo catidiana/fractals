@@ -303,3 +303,61 @@ V2 bubble (V2 coord)
     return coord2;
 }
 
+V2 random(V2 coord, u32 transform1, u32 transform2, r64 prob, affine *trans, u32 i)
+{
+    V2 coord2;
+    V2 coord3;
+    V2 coord4;
+switch (transform1) {
+                case 0: coord2 = linear(coord); break;
+                case 1: coord2 = sinusoidal(coord); break;
+                case 2: coord2 = spherical(coord); break;
+                case 3: coord2 = swirl(coord); break;
+                case 4: coord2 = horseshoe(coord); break;
+                case 5: coord2 = polar(coord); break;
+                case 6: coord2 = handkerchief(coord); break;
+                case 7: coord2 = heart(coord); break;
+                case 8: coord2 = disc(coord); break;
+                case 9: coord2 = spiral(coord); break;
+                case 10: coord2 = hyperbolic(coord); break;
+                case 11: coord2 = diamond(coord); break;
+                case 12: coord2 = ex(coord); break;
+                case 13: coord2 = julia(coord); break;
+                case 14: coord2 = waves(coord, trans, i); break;
+                case 15: coord2 = popcorn(coord, trans, i); break;
+                case 16: coord2 = exponential(coord); break;
+                case 17: coord2 = power(coord); break;
+                case 18: coord2 = rings(coord, trans, i); break;
+                case 19: coord2 = fan(coord, trans, i); break;
+                case 20: coord2 = fisheye(coord); break;
+                case 21: coord2 = bubble(coord); break;
+}
+switch (transform2) {
+                case 0: coord3 = linear(coord); break;
+                case 1: coord3 = sinusoidal(coord); break;
+                case 2: coord3 = spherical(coord); break;
+                case 3: coord3 = swirl(coord); break;
+                case 4: coord3 = horseshoe(coord); break;
+                case 5: coord3 = polar(coord); break;
+                case 6: coord3 = handkerchief(coord); break;
+                case 7: coord3 = heart(coord); break;
+                case 8: coord3 = disc(coord); break;
+                case 9: coord3 = spiral(coord); break;
+                case 10: coord3 = hyperbolic(coord); break;
+                case 11: coord3 = diamond(coord); break;
+                case 12: coord3 = ex(coord); break;
+                case 13: coord3 = julia(coord); break;
+                case 14: coord3 = waves(coord, trans, i); break;
+                case 15: coord3 = popcorn(coord, trans, i); break;
+                case 16: coord3 = exponential(coord); break;
+                case 17: coord3 = power(coord); break;
+                case 18: coord3 = rings(coord, trans, i); break;
+                case 19: coord3 = fan(coord, trans, i); break;
+                case 20: coord3 = fisheye(coord); break;
+                case 21: coord3 = bubble(coord); break;
+}
+coord4.x = prob*coord2.x + (1-prob)*coord3.x;
+coord4.y = prob*coord2.y + (1-prob)*coord3.y;
+return  coord4;
+}
+
