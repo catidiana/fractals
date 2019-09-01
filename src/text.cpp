@@ -86,8 +86,6 @@ draw_digit (Image image, u32 width, u32 height, u32 x_pos, u32 y_pos, u32 digit)
 static void
 draw_integer (Image image, u32 number)
 {
-    if (number < 1000000)
-    {
         u32 i = 0;
         while (number>0)
         {
@@ -96,77 +94,4 @@ draw_integer (Image image, u32 number)
             draw_digit (image, 10, 16, 106 - i, 13, digit);
             i=i+10;
         }
-    }
-    else {
-        u32 power= 0;
-        u32 firts_digit;
-        u32 second_digit;
-        while (number>=100) {
-            number = number/10;
-            power++;
-        }
-        power = power + 1;
-        second_digit = number%10;
-        firts_digit = number/10;
-        draw_digit (image, 10, 16, 56, 13, firts_digit);
-        draw_image (image, "res/dot.data", 7, 16, 66, 13);
-        draw_digit (image, 10, 16, 73, 13, second_digit);
-        draw_image (image, "res/e.data", 10, 16, 83, 13);
-        draw_image (image, "res/plus.data", 10, 16, 93, 13);
-        if (power <10)  draw_digit (image, 10, 16, 103, 13, power);
-        else draw_image (image, "res/plus.data", 10, 16, 103, 13);
-
-    }
-}
-
-
-static void
-draw_double (Image image, r64 number, u32 x_pos, u32 y_pos)
-{
-    if (number<0)
-    {
-        draw_image (image, "res/minus.data", 10, 16, x_pos, y_pos);
-        x_pos = x_pos + 10;
-        number = - number;
-    }
-    if (number >= 0.0001)
-    {
-        u32 digit = floor(number);
-        draw_digit (image, 10, 16, x_pos, y_pos, digit);
-        draw_image (image, "res/dot.data", 7, 16, x_pos + 10, y_pos);
-        for (u32 i = 2; i < 6; i++) {
-            number = number - digit;
-            number = number * 10;
-            digit = floor(number);
-            draw_digit (image, 10, 16, x_pos - 3 + 10*i, y_pos, digit);
-        }
-    }
-    else if ( number < 0.0001 && number >= 0.000000001)
-    {
-        u32 power = 0;
-        u32 firts_digit;
-        u32 second_digit;
-        while (number < 10) {
-            number = number*10;
-            power++;
-        }
-        power = power - 1;
-        u32 num = floor(number);
-        second_digit = num%10;
-        firts_digit = num/10;
-        draw_digit (image, 10, 16, x_pos, y_pos, firts_digit);
-        draw_image (image, "res/dot.data", 7, 16, x_pos + 10, y_pos);
-        draw_digit (image, 10, 16, x_pos + 17, y_pos, second_digit);
-        draw_image (image, "res/e.data", 10, 16, x_pos + 27, y_pos);
-        draw_image (image, "res/minus.data", 10, 16, x_pos + 37, y_pos);
-        draw_digit (image, 10, 16, x_pos + 47, y_pos, power);
-    }
-    else {
-        draw_image (image, "res/0.data", 10, 16, x_pos, y_pos);
-        draw_image (image, "res/dot.data", 7, 16, x_pos + 10, y_pos);
-        for (u32 i = 2; i < 6; i++)
-        {
-            draw_image (image, "res/0.data", 10, 16, x_pos - 3 + i*10, y_pos);
-        }
-    }
 }
