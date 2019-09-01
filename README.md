@@ -5,3 +5,4 @@ Check the 'flame' branch to get even more - program that draw Flame fractals!
 To read about flaming fractals check this wiki page https://en.wikipedia.org/wiki/Fractal_flame
 <br><br/>
 In this branch we discuss Julia fractals only. Switch branch to discover flame fractals.
+![fr](https://user-images.githubusercontent.com/50684862/64082241-98510f80-cd14-11e9-939c-7a7381e663c8.png)
