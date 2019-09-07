@@ -260,7 +260,7 @@ main (int argc, char **argv)
                                 {-0.382, 0.618},{-0.618, 0},{-0.74543, 0.11301},
                                 {- 0.8, 0.156},{-0.70176, -0.3842}, {-0.835, -0.2321},
                                 { -0.7269, 0.1889}, {0, -0.8}};
-    u32 constant_pool_num;
+    u32 constant_pool_num = 0;
 
     r64 constant_x = constant_pool[constant_pool_num][0];
     r64 constant_y = constant_pool[constant_pool_num][1];
